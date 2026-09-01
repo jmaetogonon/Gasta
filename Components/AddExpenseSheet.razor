@@ -1,0 +1,156 @@
+@* Usage from Home.razor (placed at page root, after other content, so it renders on top):
+   <AddExpenseSheet @bind-IsOpen="ShowAddExpense" Category="SelectedCategory" OnSaved="LoadAsync" />
+*@
+@inject Gasta.Data.Repositories.IExpenseRepository ExpenseRepository
+@inject Gasta.Data.Repositories.IPaymentMethodRepository PaymentMethodRepository
+@inject Gasta.Data.Repositories.ICategoryRepository CategoryRepository
+
+<div class="sheet-scrim @(IsOpen ? "open" : "")" @onclick="Cancel"></div>
+<div class="sheet-panel @(IsOpen ? "open" : "")" @onclick:stopPropagation="true">
+
+    @if (Category is not null)
+    {
+        <div class="sheet-header">
+            <span class="sheet-title">Add Expense</span>
+            <span class="sheet-category" style="color:@Category.ColorKey;">@Category.Name</span>
+        </div>
+
+        <label class="field-label">Date</label>
+        <input class="field-input" type="date" value="@Date.ToString("yyyy-MM-dd")"
+               @onchange="OnDateChanged" />
+
+        <label class="field-label">Amount</label>
+        <div class="field-input tappable" @onclick="() => OpenKeypad(KeypadTarget.Amount)">
+            @Amount.ToString("₱#,##0.00")
+        </div>
+
+        <label class="field-label">Payment Method</label>
+        <div class="chip-wrap">
+            @foreach (var m in PaymentMethods)
+            {
+                <div class="pm-chip @(SelectedPaymentMethodId == m.Id ? "selected" : "")"
+                     @onclick="() => SelectedPaymentMethodId = m.Id">
+                    <img src="images/payments/@(m.LogoImage).svg" />
+                    @if (SelectedPaymentMethodId == m.Id)
+                    {
+                        <span class="check-badge">✓</span>
+                    }
+                </div>
+            }
+        </div>
+
+        <label class="field-label">Set Budget (@Category.Name)</label>
+        <div class="field-input tappable" @onclick="() => OpenKeypad(KeypadTarget.Budget)">
+            @CategoryBudget.ToString("₱#,##0.00")
+        </div>
+
+        <label class="field-label">Notes</label>
+        <textarea class="field-input notes" @bind="Notes" placeholder="Optional note..."></textarea>
+
+        <div class="action-row">
+            <button class="cancel-button" @onclick="Cancel">Cancel</button>
+            <button class="save-button" disabled="@(!CanSave)" @onclick="Save">Save</button>
+        </div>
+    }
+</div>
+
+<NumericKeypad @bind-IsOpen="ShowKeypad"
+                InitialValue="@(_keypadTarget == KeypadTarget.Amount ? Amount : CategoryBudget)"
+                OnConfirmed="OnKeypadConfirmed" />
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public Gasta.Services.SpendSummary? Category { get; set; }
+    [Parameter] public EventCallback OnSaved { get; set; }
+
+    private bool _wasOpen;
+    private bool ShowKeypad;
+    private DateTime Date = DateTime.Now;
+    private decimal Amount;
+    private decimal CategoryBudget;
+    private int? SelectedPaymentMethodId;
+    private string Notes = "";
+    private List<Gasta.Models.PaymentMethod> PaymentMethods = new();
+
+    private enum KeypadTarget { Amount, Budget }
+    private KeypadTarget _keypadTarget = KeypadTarget.Amount;
+
+    private bool CanSave => Amount > 0 && SelectedPaymentMethodId.HasValue && Category is not null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsOpen && !_wasOpen)
+        {
+            // Fresh entry every time the sheet opens, same as MAUI's per-open ViewModel.
+            Date = DateTime.Now;
+            Amount = 0;
+            CategoryBudget = Category?.Budget ?? 0;
+            SelectedPaymentMethodId = null;
+            Notes = "";
+            ShowKeypad = false;
+
+            if (PaymentMethods.Count == 0)
+            {
+                PaymentMethods = await PaymentMethodRepository.GetActiveOrderedAsync();
+            }
+        }
+        _wasOpen = IsOpen;
+    }
+
+    private void OpenKeypad(KeypadTarget target)
+    {
+        _keypadTarget = target;
+        ShowKeypad = true;
+    }
+
+    private void OnDateChanged(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out var d))
+            Date = d;
+    }
+
+    private void OnKeypadConfirmed(decimal value)
+    {
+        if (_keypadTarget == KeypadTarget.Amount)
+            Amount = value;
+        else
+            CategoryBudget = value;
+    }
+
+    private async Task Save()
+    {
+        if (!CanSave || Category is null) return;
+
+        var expense = new Gasta.Models.Expense
+        {
+            Date = Date,
+            Amount = Amount,
+            CategoryId = Category.Id,
+            PaymentMethodId = SelectedPaymentMethodId!.Value,
+            Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes
+        };
+        await ExpenseRepository.SaveAsync(expense);
+
+        if (CategoryBudget != Category.Budget)
+        {
+            var categoryModel = await CategoryRepository.GetByIdAsync(Category.Id);
+            if (categoryModel is not null)
+            {
+                categoryModel.MonthlyBudget = CategoryBudget;
+                await CategoryRepository.SaveAsync(categoryModel);
+            }
+        }
+
+        await OnSaved.InvokeAsync();
+        await Close();
+    }
+
+    private async Task Cancel() => await Close();
+
+    private async Task Close()
+    {
+        IsOpen = false;
+        await IsOpenChanged.InvokeAsync(false);
+    }
+}

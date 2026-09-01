@@ -1,0 +1,160 @@
+@page "/expenselist"
+@using Gasta.Components
+@inject Gasta.Services.ExpenseSummaryService SummaryService
+@inject Gasta.Data.Repositories.IPaymentMethodRepository PaymentMethodRepository
+@inject Gasta.Data.Repositories.IExpenseRepository ExpenseRepository
+@inject NavigationManager Nav
+
+<div class="header-bar" style="background:@(_paymentMethod?.ColorKey ?? "#5B7FE8");">
+    <span class="back-arrow" @onclick="GoBack">&#10094;</span>
+    @if (_paymentMethod is not null)
+    {
+        <img src="images/payments/@(_paymentMethod.LogoImage).svg" class="header-logo" />
+        <span class="header-name">@_paymentMethod.Name</span>
+    }
+</div>
+
+<div class="total-card">
+    <span class="total-label">TOTAL THIS MONTH</span>
+    <span class="total-amount">@Total.ToString("₱#,##0.00")</span>
+</div>
+
+<div class="transaction-list">
+    @if (Transactions.Count == 0)
+    {
+        <div class="empty-state">No transactions yet this month.</div>
+    }
+    @foreach (var item in Transactions)
+    {
+        <div class="transaction-row-wrap">
+            <div class="delete-action" @onclick="() => DeleteExpense(item.Id)">🗑 Delete</div>
+
+            <div class="transaction-row"
+                 style="transform:translateX(@(GetOffset(item.Id).ToString(System.Globalization.CultureInfo.InvariantCulture))px);"
+                 @onpointerdown="e => OnPointerDown(e, item.Id)"
+                 @onpointermove="OnPointerMove"
+                 @onpointerup="e => OnPointerUp(item)"
+                 @onpointercancel="OnPointerCancel">
+                <div class="tx-icon" style="background:@item.CategoryColorKey;">
+                    <img src="images/categories/@(item.CategoryLogo).png" />
+                </div>
+                <div class="tx-info">
+                    <span class="tx-category">@item.CategoryName</span>
+                    @if (!string.IsNullOrWhiteSpace(item.Notes))
+                    {
+                        <span class="tx-notes">@item.Notes</span>
+                    }
+                    <span class="tx-date">@item.Date.ToString("MMM d")</span>
+                </div>
+                <strong class="tx-amount">@item.Amount.ToString("₱#,##0.00")</strong>
+            </div>
+        </div>
+    }
+</div>
+
+<EditExpenseSheet @bind-IsOpen="ShowEdit" ExpenseId="EditingExpenseId" OnSaved="LoadAsync" />
+
+@code {
+    [SupplyParameterFromQuery(Name = "paymentMethodId")]
+    [Parameter]
+    public int PaymentMethodId { get; set; }
+
+    private Gasta.Models.PaymentMethod? _paymentMethod;
+    private List<Gasta.Services.ExpenseListItem> Transactions = new();
+    private decimal Total;
+
+    private readonly DateTime Now = DateTime.Now;
+
+    // --- Swipe-to-reveal-delete state (pure Blazor pointer events, no JS) ---
+    private readonly Dictionary<int, double> _offsets = new();
+    private int? _draggingId;
+    private double _startX;
+    private double _startOffset;
+    private bool _dragMoved;
+    private const double RevealOffset = -84;   // matches .delete-action width
+    private const double DragThreshold = 8;    // px of movement before it counts as a drag, not a tap
+    private const double SnapThreshold = 40;   // px dragged before snapping fully open/closed
+
+    private bool ShowEdit;
+    private int EditingExpenseId;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _paymentMethod = await PaymentMethodRepository.GetByIdAsync(PaymentMethodId);
+        Transactions = await SummaryService.GetTransactionsForPaymentMethodAsync(Now.Year, Now.Month, PaymentMethodId);
+        Total = Transactions.Sum(t => t.Amount);
+    }
+
+    private double GetOffset(int id) => _offsets.TryGetValue(id, out var v) ? v : 0;
+
+    private void OnPointerDown(PointerEventArgs e, int id)
+    {
+        _draggingId = id;
+        _startX = e.ClientX;
+        _startOffset = GetOffset(id);
+        _dragMoved = false;
+    }
+
+    private void OnPointerMove(PointerEventArgs e)
+    {
+        if (_draggingId is not int id) return;
+
+        var dx = e.ClientX - _startX;
+        if (Math.Abs(dx) > DragThreshold) _dragMoved = true;
+
+        var newOffset = Math.Clamp(_startOffset + dx, RevealOffset, 0);
+        _offsets[id] = newOffset;
+    }
+
+    private async Task OnPointerUp(Gasta.Services.ExpenseListItem item)
+    {
+        if (_draggingId != item.Id) { _draggingId = null; return; }
+
+        var id = item.Id;
+        var offset = GetOffset(id);
+
+        if (!_dragMoved)
+        {
+            // Plain tap. If the row was already revealed, tapping it just closes it
+            // again (matches native SwipeView "tap elsewhere to close"). Otherwise
+            // it's a request to edit this transaction.
+            if (offset < -1)
+            {
+                _offsets[id] = 0;
+            }
+            else
+            {
+                OpenEdit(item.Id);
+            }
+        }
+        else
+        {
+            _offsets[id] = offset < -SnapThreshold ? RevealOffset : 0;
+        }
+
+        _draggingId = null;
+    }
+
+    private void OnPointerCancel()
+    {
+        if (_draggingId is int id) _offsets[id] = _startOffset;
+        _draggingId = null;
+    }
+
+    private async Task DeleteExpense(int expenseId)
+    {
+        await ExpenseRepository.DeleteAsync(expenseId);
+        _offsets.Remove(expenseId);
+        await LoadAsync();
+    }
+
+    private void OpenEdit(int expenseId)
+    {
+        EditingExpenseId = expenseId;
+        ShowEdit = true;
+    }
+
+    private void GoBack() => Nav.NavigateTo("/");
+}
