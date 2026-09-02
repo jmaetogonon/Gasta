@@ -2,26 +2,31 @@
     max-width: 480px;
     margin: 0 auto;
     padding: 20px;
-    padding-bottom: 110px; /* clears the floating nav so content never hides behind it */
+    padding-bottom: 110px; /* clears the full-width nav so content never hides behind it */
 }
 
 .bottom-nav {
     position: fixed;
-    bottom: 14px;
-    left: 16px;
-    right: 16px;
-    max-width: 448px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 480px;
     margin: 0 auto;
     background: var(--nav-bg);
-    border-radius: 28px;
-    box-shadow: var(--shadow-chip);
+    border-radius: 0;
+    box-shadow: none;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 10px 18px;
+    padding: 16px 24px calc(16px + env(safe-area-inset-bottom, 0px));
 }
 
-.nav-item {
+/* ::deep is required for every rule below. <NavLink> is a separate Razor
+   component, so the <a> it renders never receives MainLayout's own CSS
+   isolation scope attribute — a plain scoped selector like ".nav-item"
+   compiles to ".nav-item[b-xxxx]" and silently never matches that <a>.
+   ::deep tells the compiler not to require the scope attribute here. */
+::deep .nav-item {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -30,44 +35,45 @@
     border-radius: 16px;
     color: var(--text-secondary);
     text-decoration: none;
-    transition: background 0.2s ease, color 0.2s ease;
+    opacity: 0.6;
+    transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
 }
 
-    .nav-item svg {
+    ::deep .nav-item svg {
         transition: transform 0.2s ease;
     }
 
     /* Blazor's NavLink applies "active" automatically. Icon color comes for
-       free since the SVGs use stroke="currentColor" — no separate icon-color
-       logic needed. Excludes the center button, which has its own treatment. */
-    .nav-item.active:not(.nav-item-main) {
-        color: var(--color-primary);
+   free since the SVGs use stroke="currentColor" — no separate icon-color
+   logic needed. Excludes the center button, which has its own treatment. */
+    ::deep .nav-item.active:not(.nav-item-main) {
+        opacity: 1;
+        color: white;
         background: var(--nav-active-bg);
     }
 
-        .nav-item.active:not(.nav-item-main) svg {
+        ::deep .nav-item.active:not(.nav-item-main) svg {
             transform: translateY(-1px);
         }
 
-.nav-item-main {
+::deep .nav-item-main {
     background: linear-gradient(150deg, var(--color-primary), var(--color-primary-dark));
     color: white !important;
     width: 50px;
     height: 50px;
     border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    opacity: 1;
     box-shadow: 0 6px 14px rgba(91, 79, 232, 0.4);
-    margin-top: -6px; /* a slight raised "coin" feel, still seated in the bar —
-                          not a detached floating FAB, matching the earlier
-                          explicit decision against that pattern */
 }
 
-    .nav-item-main .peso-glyph {
+    ::deep .nav-item-main .peso-glyph {
         font-family: var(--font-display);
         font-weight: 700;
         font-size: 21px;
         line-height: 1;
     }
 
-    .nav-item-main.active {
+    ::deep .nav-item-main.active {
         box-shadow: 0 6px 18px rgba(91, 79, 232, 0.55);
     }

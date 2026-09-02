@@ -135,7 +135,7 @@ else
     }
 
     private void GoToExpenseList(int paymentMethodId) =>
-        Nav.NavigateTo($"/expenselist?paymentMethodId={paymentMethodId}");
+        Nav.NavigateTo($"expenselist?paymentMethodId={paymentMethodId}");
 
     // Payment chip/row backgrounds are per-record brand colors (from seed data), not
     // theme-driven, so amount text needs a fixed color that reads on each one. Every
