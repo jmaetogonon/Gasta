@@ -5,11 +5,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gasta</title>
-    <base href="/Gasta/" />
+    <base href="/" />
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('gasta-theme'); // matches ThemeService.StorageKey
+                var theme = saved === 'Dark' ? 'dark' : 'light';  // matches ThemeService's casing
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
     <link rel="preload" id="webassembly" />
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="gasta.png" />
     <link href="Gasta.styles.css" rel="stylesheet" />
     <link href="manifest.webmanifest" rel="manifest" />
@@ -18,13 +27,23 @@
     <script type="importmap"></script>
 </head>
 
-<body>
+<body> 
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <div class="loading-screen">
+            <div class="loading-ring-wrap">
+                <svg class="loading-ring" viewBox="0 0 120 120">
+                    <circle class="loading-ring-track" cx="60" cy="60" r="54" />
+                    <circle class="loading-ring-bar" cx="60" cy="60" r="54" />
+                </svg>
+                <div class="loading-video-wrap">
+                    <video class="loading-video" autoplay loop muted playsinline>
+                        <source src="videos/gasta-loading-transparent.webm" type="video/webm" />
+                    </video>
+                </div>
+            </div>
+            <div class="loading-percentage"></div>
+            <div class="loading-text">Loading Gasta<span class="loading-dots"><span></span><span></span><span></span></span></div>
+        </div>
     </div>
 
     <div id="blazor-error-ui">
