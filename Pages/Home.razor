@@ -2,6 +2,7 @@
 @using Gasta.Components
 @using Gasta.Helpers
 @inject Services.ExpenseSummaryService SummaryService
+@inject Services.ThemeService ThemeService
 @inject NavigationManager Nav
 
 <div class="header">
@@ -32,9 +33,20 @@
     <span class="@(IsPaymentsTab ? "tab active" : "tab")" @onclick="() => IsPaymentsTab = true">PAYMENTS</span>
     @if (IsPaymentsTab)
     {
-        <div class="view-toggle">
-            <span class="view-icon" @onclick="() => PaymentsGridView = !PaymentsGridView">
-                @(PaymentsGridView ? "☰" : "▦")
+        <div class="view-toggle" @onclick="() => PaymentsGridView = !PaymentsGridView">
+            <span class="view-icon">
+                @if (PaymentsGridView)
+                {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
+                    </svg>
+                }
+                else
+                {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grid" viewBox="0 0 16 16">
+                        <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z" />
+                    </svg>
+                }
             </span>
         </div>
     }
@@ -47,7 +59,7 @@
         <div class="chip-grid">
             @foreach (var payment in Payments)
             {
-                <div class="chip" style="background:@payment.ColorKey;" @onclick="() => GoToExpenseList(payment.Id)">
+                <div class="chip" style="background:@PaymentChipBackground(payment);" @onclick="() => GoToExpenseList(payment.Id)">
                     <img src="images/payments/@(payment.LogoImage).svg" />
                     <strong style="color:@(AmountTextColor(payment));">@payment.Spent.ToString("₱#,##0.00")</strong>
                 </div>
@@ -59,7 +71,7 @@
         <div class="payment-list">
             @foreach (var payment in Payments)
             {
-                <div class="payment-row" style="background:@payment.ColorKey;" @onclick="() => GoToExpenseList(payment.Id)">
+                <div class="payment-row" style="background:@PaymentChipBackground(payment);" @onclick="() => GoToExpenseList(payment.Id)">
                     <div class="payment-row-logo">
                         <img src="images/payments/@(payment.LogoImage).svg" />
                     </div>
@@ -79,7 +91,7 @@ else
             <div class="category-item" @onclick="() => OpenAddExpense(category)">
                 <div class="ring-wrap">
                     <svg viewBox="0 0 64 64" class="ring">
-                        <circle class="ring-track" cx="32" cy="32" r="28" style="stroke:@ColorHelper.Lighten(category.ColorKey);" />
+                        <circle class="ring-track" cx="32" cy="32" r="28" style="stroke:@ColorHelper.AdaptiveTrack(category.ColorKey, ThemeService.IsDark);" />
                         <circle class="ring-fill" cx="32" cy="32" r="28"
                                 style="stroke:@category.ColorKey; stroke-dasharray:@circumference; stroke-dashoffset:@offset;" />
                     </svg>
@@ -143,4 +155,7 @@ else
     // so black works everywhere except that one case.
     private static string AmountTextColor(Services.SpendSummary payment) =>
         payment.Name == "Maya" ? "white" : "black";
+
+    private string PaymentChipBackground(Services.SpendSummary payment) =>
+    ThemeService.IsDark ? ColorHelper.Darken(payment.ColorKey, 0.22) : payment.ColorKey;
 }

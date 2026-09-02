@@ -143,10 +143,10 @@
     height: 100%;
 }
 
-.view-icon {
-    font-size: 1.125rem;
+.view-icon svg {
     color: var(--text-secondary);
     cursor: pointer;
+    margin-bottom: 4px;
 }
 
 .payment-list {

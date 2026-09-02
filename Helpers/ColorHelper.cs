@@ -13,12 +13,27 @@ public static class ColorHelper
     // Same default as the MAUI build — reverse-engineered from a concrete Figma example
     // (#FFCD9D -> #FFE9D4), not from an "X% opacity" guess.
     private const double DefaultBlendAmount = 0.56;
+    private const double DefaultDarkTrackAmount = 0.35;
 
     public static string Lighten(string hex, double amount = DefaultBlendAmount) =>
         Blend(hex, amount, towardWhite: true);
 
     public static string Darken(string hex, double amount = 0.3) =>
         Blend(hex, amount, towardWhite: false);
+
+    /// <summary>
+    /// Theme-aware derived tone for backgrounds/tracks — same concept as MAUI's
+    /// theme-aware "Bg:light:dark" ConverterParameter. Lightens toward white in light
+    /// mode (the usual 0.56 default), but DARKENS toward black in dark mode instead:
+    /// blending every category color toward white on a dark surface collapses them all
+    /// into the same washed-out pale gray, losing the hue that distinguishes one
+    /// category from another. Darkening keeps each color's identity intact while still
+    /// reading as a dim "track" rather than the vivid fill color sitting on top of it.
+    /// </summary>
+    public static string AdaptiveTrack(
+        string hex, bool isDark,
+        double lightAmount = DefaultBlendAmount, double darkAmount = DefaultDarkTrackAmount) =>
+        isDark ? Darken(hex, darkAmount) : Lighten(hex, lightAmount);
 
     private static string Blend(string hex, double amount, bool towardWhite)
     {

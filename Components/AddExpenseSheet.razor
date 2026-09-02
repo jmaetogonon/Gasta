@@ -1,55 +1,82 @@
 @* Usage from Home.razor (placed at page root, after other content, so it renders on top):
    <AddExpenseSheet @bind-IsOpen="ShowAddExpense" Category="SelectedCategory" OnSaved="LoadAsync" />
 *@
+@using Gasta.Helpers
 @inject Gasta.Data.Repositories.IExpenseRepository ExpenseRepository
 @inject Gasta.Data.Repositories.IPaymentMethodRepository PaymentMethodRepository
 @inject Gasta.Data.Repositories.ICategoryRepository CategoryRepository
+@inject Gasta.Services.ThemeService ThemeService
 
 <div class="sheet-scrim @(IsOpen ? "open" : "")" @onclick="Cancel"></div>
 <div class="sheet-panel @(IsOpen ? "open" : "")" @onclick:stopPropagation="true">
 
     @if (Category is not null)
     {
-        <div class="sheet-header">
-            <span class="sheet-title">Add Expense</span>
-            <span class="sheet-category" style="color:@Category.ColorKey;">@Category.Name</span>
+        <div class="sheet-banner" style="background:@Category.ColorKey;">
+            <span class="banner-title">ADD @Category.Name.ToUpper() EXPENSE</span>
+            <button class="close-btn" @onclick="Cancel">&#10005;</button>
         </div>
 
-        <label class="field-label">Date</label>
-        <input class="field-input" type="date" value="@Date.ToString("yyyy-MM-dd")"
-               @onchange="OnDateChanged" />
+        <div class="sheet-body">
+            <label class="field-label">Date</label>
+            <input class="field-input" type="date" value="@Date.ToString("yyyy-MM-dd")"
+                   @onchange="OnDateChanged" />
 
-        <label class="field-label">Amount</label>
-        <div class="field-input tappable" @onclick="() => OpenKeypad(KeypadTarget.Amount)">
-            @Amount.ToString("₱#,##0.00")
-        </div>
+            <label class="field-label">Expense</label>
+            <div class="field-input tappable" @onclick="() => OpenKeypad(KeypadTarget.Amount)">
+                @if (Amount <= 0)
+                {
+                    <span class="placeholder-text">Tap to enter amount</span>
+                }
+                else
+                {
+                    <span>@Amount.ToString("₱#,##0.00")</span>
+                }
+                <span class="chevron">&#10095;</span>
+            </div>
 
-        <label class="field-label">Payment Method</label>
-        <div class="chip-wrap">
-            @foreach (var m in PaymentMethods)
-            {
-                <div class="pm-chip @(SelectedPaymentMethodId == m.Id ? "selected" : "")"
-                     @onclick="() => SelectedPaymentMethodId = m.Id">
-                    <img src="images/payments/@(m.LogoImage).svg" />
-                    @if (SelectedPaymentMethodId == m.Id)
-                    {
-                        <span class="check-badge">✓</span>
-                    }
-                </div>
-            }
-        </div>
+            <label class="field-label">Payment Method</label>
+            <div class="chip-wrap">
+                @foreach (var m in PaymentMethods)
+                {
+                    <div class="pm-chip @(SelectedPaymentMethodId == m.Id ? "selected" : "")"
+                         style="@(SelectedPaymentMethodId == m.Id ? $"border-color:{m.ColorKey}; box-shadow: var(--shadow-chip), 0 0 0 4px {m.ColorKey}33;" : "")"
+                         @onclick="() => SelectedPaymentMethodId = m.Id">
+                        <img src="images/payments/@(m.LogoImage).svg" />
+                        @if (SelectedPaymentMethodId == m.Id)
+                        {
+                            <span class="check-badge">&#10003;</span>
+                        }
+                    </div>
+                }
+            </div>
 
-        <label class="field-label">Set Budget (@Category.Name)</label>
-        <div class="field-input tappable" @onclick="() => OpenKeypad(KeypadTarget.Budget)">
-            @CategoryBudget.ToString("₱#,##0.00")
-        </div>
+            <label class="field-label">Set Budget (@Category.Name)</label>
+            <div class="field-input tappable" @onclick="() => OpenKeypad(KeypadTarget.Budget)">
+                @if (CategoryBudget <= 0)
+                {
+                    <span class="placeholder-text">Tap to enter budget</span>
+                }
+                else
+                {
+                    <span>@CategoryBudget.ToString("₱#,##0.00")</span>
+                }
+                <span class="chevron">&#10095;</span>
+            </div>
 
-        <label class="field-label">Notes</label>
-        <textarea class="field-input notes" @bind="Notes" placeholder="Optional note..."></textarea>
+            <label class="field-label">Notes</label>
+            <textarea class="field-input notes" @bind="Notes" placeholder="Add a note"></textarea>
 
-        <div class="action-row">
-            <button class="cancel-button" @onclick="Cancel">Cancel</button>
-            <button class="save-button" disabled="@(!CanSave)" @onclick="Save">Save</button>
+            <div class="action-row">
+                <button class="cancel-button"
+                        style="background:@ColorHelper.AdaptiveTrack(Category.ColorKey, ThemeService.IsDark, lightAmount: 0.8, darkAmount: 0.6); color:@Category.ColorKey; border-color:@Category.ColorKey;"
+                        @onclick="Cancel">
+                    Cancel
+                </button>
+                <button class="save-button" style="background:@Category.ColorKey;" disabled="@(!CanSave)" @onclick="Save">
+                    Add Expense
+                </button>
+            </div>
         </div>
     }
 </div>
