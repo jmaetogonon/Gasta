@@ -45,17 +45,16 @@
     font-size: 16px;
 }
 
-.sheet-category {
-    font-weight: bold;
-    font-size: 13px;
-}
-
 .field-label {
     display: block;
     font-size: 11px;
     color: var(--text-secondary);
     margin: 14px 0 6px;
 }
+
+    .field-label:first-of-type {
+        margin-top: 0;
+    }
 
 .field-input {
     width: 100%;
@@ -70,9 +69,12 @@
     .field-input.tappable {
         cursor: pointer;
         font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
-    .field-input.category-field {
+    .field-input.category-field .field-left {
         display: flex;
         align-items: center;
         gap: 10px;
@@ -89,47 +91,72 @@
         font-family: inherit;
     }
 
+.field-input[type="date"] {
+    color-scheme: light;
+}
+
+[data-theme="dark"] .field-input[type="date"] {
+    color-scheme: dark;
+}
+
+.placeholder-text {
+    color: var(--text-secondary);
+    font-weight: normal;
+}
+
+.chevron {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: normal;
+}
+
 .chip-wrap {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
 }
 
 .pm-chip {
     position: relative;
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    background: var(--LogoChipBackground, #ffffff);
     display: flex;
     align-items: center;
     justify-content: center;
+    height: 54px;
+    border-radius: 14px;
+    padding: 6px;
+    background: var(--LogoChipBackground, #ffffff);
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow-soft);
     cursor: pointer;
-    border: 2px solid transparent;
 }
 
     .pm-chip img {
-        width: 28px;
-        height: 28px;
+        max-width: 85%;
+        max-height: 26px;
+        object-fit: contain;
     }
 
     .pm-chip.selected {
         border-color: var(--color-primary);
+        border-width: 2.5px;
+        box-shadow: var(--shadow-chip);
     }
 
 .check-badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 16px;
-    height: 16px;
+    top: -6px;
+    right: -6px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: var(--color-primary);
     color: white;
     font-size: 10px;
+    font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 2px solid var(--surface);
 }
 
 .action-row {

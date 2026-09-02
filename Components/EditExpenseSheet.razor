@@ -19,18 +19,29 @@
         <div class="field-input tappable category-field" @onclick="() => ShowCategoryPicker = true">
             @if (SelectedCategory is not null)
             {
-                <img src="images/categories/@(SelectedCategory.LogoImage).png" class="inline-icon" />
-                <span>@SelectedCategory.Name</span>
+                <span class="field-left">
+                    <img src="images/categories/@(SelectedCategory.LogoImage).png" class="inline-icon" />
+                    <span>@SelectedCategory.Name</span>
+                </span>
             }
             else
             {
-                <span>Select category</span>
+                <span class="placeholder-text">Select category</span>
             }
+            <span class="chevron">&#10095;</span>
         </div>
 
         <label class="field-label">Amount</label>
         <div class="field-input tappable" @onclick="() => ShowKeypad = true">
-            @Amount.ToString("₱#,##0.00")
+            @if (Amount <= 0)
+            {
+                <span class="placeholder-text">Tap to enter amount</span>
+            }
+            else
+            {
+                <span>@Amount.ToString("₱#,##0.00")</span>
+            }
+            <span class="chevron">&#10095;</span>
         </div>
 
         <label class="field-label">Payment Method</label>
@@ -42,7 +53,7 @@
                     <img src="images/payments/@(m.LogoImage).svg" />
                     @if (SelectedPaymentMethodId == m.Id)
                     {
-                        <span class="check-badge">✓</span>
+                        <span class="check-badge">&#10003;</span>
                     }
                 </div>
             }

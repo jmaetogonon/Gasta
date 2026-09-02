@@ -3,15 +3,21 @@
 @inject Gasta.Services.ExpenseSummaryService SummaryService
 @inject Gasta.Data.Repositories.IPaymentMethodRepository PaymentMethodRepository
 @inject Gasta.Data.Repositories.IExpenseRepository ExpenseRepository
+@inject Gasta.Services.AlertService Alert
 @inject NavigationManager Nav
 
 <div class="header-bar" style="background:@(_paymentMethod?.ColorKey ?? "#5B7FE8");">
-    <span class="back-arrow" @onclick="GoBack">&#10094;</span>
+    <button class="icon-btn" @onclick="GoBack">&#10094;</button>
+
     @if (_paymentMethod is not null)
     {
         <img src="images/payments/@(_paymentMethod.LogoImage).svg" class="header-logo" />
-        <span class="header-name">@_paymentMethod.Name</span>
     }
+
+    @* <div class="header-actions">
+        <button class="icon-btn" @onclick="OnEditPaymentMethod">&#9998;</button>
+        <button class="icon-btn" @onclick="GoBack">&#10005;</button>
+    </div> *@
 </div>
 
 <div class="total-card">
@@ -71,9 +77,18 @@
     private double _startX;
     private double _startOffset;
     private bool _dragMoved;
+    private DateTime _pointerDownTime;
+
     private const double RevealOffset = -84;   // matches .delete-action width
-    private const double DragThreshold = 8;    // px of movement before it counts as a drag, not a tap
+    private const double DragThreshold = 12;   // px of movement before it counts as a drag, not a tap —
+                                                // raised from 8: real touchscreens have natural finger
+                                                // jitter during a tap that easily exceeded the old value,
+                                                // which was silently swallowing taps on mobile.
     private const double SnapThreshold = 40;   // px dragged before snapping fully open/closed
+    private const double QuickTapMs = 300;     // a fast enough release, even with some movement, is
+                                                // still almost certainly a tap rather than an intentional
+                                                // swipe — a second safety net alongside the distance check.
+    private const double QuickTapMaxDistance = 20;
 
     private bool ShowEdit;
     private int EditingExpenseId;
@@ -95,6 +110,7 @@
         _startX = e.ClientX;
         _startOffset = GetOffset(id);
         _dragMoved = false;
+        _pointerDownTime = DateTime.UtcNow;
     }
 
     private void OnPointerMove(PointerEventArgs e)
@@ -114,12 +130,18 @@
 
         var id = item.Id;
         var offset = GetOffset(id);
+        var elapsedMs = (DateTime.UtcNow - _pointerDownTime).TotalMilliseconds;
+        var totalDistance = Math.Abs(offset - _startOffset);
 
-        if (!_dragMoved)
+        // Treat as a tap if it never crossed the drag threshold, OR it was fast enough
+        // and short enough to almost certainly be a tap despite minor touch jitter.
+        var isTap = !_dragMoved || (elapsedMs < QuickTapMs && totalDistance < QuickTapMaxDistance);
+
+        if (isTap)
         {
-            // Plain tap. If the row was already revealed, tapping it just closes it
-            // again (matches native SwipeView "tap elsewhere to close"). Otherwise
-            // it's a request to edit this transaction.
+            // If the row was already revealed, tapping it just closes it again
+            // (matches native SwipeView "tap elsewhere to close"). Otherwise it's a
+            // request to edit this transaction.
             if (offset < -1)
             {
                 _offsets[id] = 0;
@@ -156,5 +178,11 @@
         ShowEdit = true;
     }
 
-    private void GoBack() => Nav.NavigateTo("");
+    private async Task OnEditPaymentMethod()
+    {
+        // Manage Payment Methods isn't built yet — same "Coming soon" pattern as Settings.
+        await Alert.ShowAsync("Editing payment methods is coming soon.", "Coming Soon");
+    }
+
+    private void GoBack() => Nav.NavigateTo("/");
 }
