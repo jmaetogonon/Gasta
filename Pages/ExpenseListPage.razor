@@ -14,10 +14,10 @@
         <img src="images/payments/@(_paymentMethod.LogoImage).svg" class="header-logo" />
     }
 
-    @* <div class="header-actions">
+    <div class="header-actions">
         <button class="icon-btn" @onclick="OnEditPaymentMethod">&#9998;</button>
         <button class="icon-btn" @onclick="GoBack">&#10005;</button>
-    </div> *@
+    </div>
 </div>
 
 <div class="total-card">
@@ -32,29 +32,7 @@
     }
     @foreach (var item in Transactions)
     {
-        <div class="transaction-row-wrap">
-            <div class="delete-action" @onclick="() => DeleteExpense(item.Id)">🗑 Delete</div>
-
-            <div class="transaction-row"
-                 style="transform:translateX(@(GetOffset(item.Id).ToString(System.Globalization.CultureInfo.InvariantCulture))px);"
-                 @onpointerdown="e => OnPointerDown(e, item.Id)"
-                 @onpointermove="OnPointerMove"
-                 @onpointerup="e => OnPointerUp(item)"
-                 @onpointercancel="OnPointerCancel">
-                <div class="tx-icon" style="background:@item.CategoryColorKey;">
-                    <img src="images/categories/@(item.CategoryLogo).png" />
-                </div>
-                <div class="tx-info">
-                    <span class="tx-category">@item.CategoryName</span>
-                    @if (!string.IsNullOrWhiteSpace(item.Notes))
-                    {
-                        <span class="tx-notes">@item.Notes</span>
-                    }
-                    <span class="tx-date">@item.Date.ToString("MMM d")</span>
-                </div>
-                <strong class="tx-amount">@item.Amount.ToString("₱#,##0.00")</strong>
-            </div>
-        </div>
+        <SwipeableTransactionRow Item="item" OnTap="OpenEdit" OnDelete="DeleteExpense" />
     }
 </div>
 
@@ -71,25 +49,6 @@
 
     private readonly DateTime Now = DateTime.Now;
 
-    // --- Swipe-to-reveal-delete state (pure Blazor pointer events, no JS) ---
-    private readonly Dictionary<int, double> _offsets = new();
-    private int? _draggingId;
-    private double _startX;
-    private double _startOffset;
-    private bool _dragMoved;
-    private DateTime _pointerDownTime;
-
-    private const double RevealOffset = -84;   // matches .delete-action width
-    private const double DragThreshold = 12;   // px of movement before it counts as a drag, not a tap —
-                                                // raised from 8: real touchscreens have natural finger
-                                                // jitter during a tap that easily exceeded the old value,
-                                                // which was silently swallowing taps on mobile.
-    private const double SnapThreshold = 40;   // px dragged before snapping fully open/closed
-    private const double QuickTapMs = 300;     // a fast enough release, even with some movement, is
-                                                // still almost certainly a tap rather than an intentional
-                                                // swipe — a second safety net alongside the distance check.
-    private const double QuickTapMaxDistance = 20;
-
     private bool ShowEdit;
     private int EditingExpenseId;
 
@@ -102,73 +61,9 @@
         Total = Transactions.Sum(t => t.Amount);
     }
 
-    private double GetOffset(int id) => _offsets.TryGetValue(id, out var v) ? v : 0;
-
-    private void OnPointerDown(PointerEventArgs e, int id)
-    {
-        _draggingId = id;
-        _startX = e.ClientX;
-        _startOffset = GetOffset(id);
-        _dragMoved = false;
-        _pointerDownTime = DateTime.UtcNow;
-    }
-
-    private void OnPointerMove(PointerEventArgs e)
-    {
-        if (_draggingId is not int id) return;
-
-        var dx = e.ClientX - _startX;
-        if (Math.Abs(dx) > DragThreshold) _dragMoved = true;
-
-        var newOffset = Math.Clamp(_startOffset + dx, RevealOffset, 0);
-        _offsets[id] = newOffset;
-    }
-
-    private async Task OnPointerUp(Gasta.Services.ExpenseListItem item)
-    {
-        if (_draggingId != item.Id) { _draggingId = null; return; }
-
-        var id = item.Id;
-        var offset = GetOffset(id);
-        var elapsedMs = (DateTime.UtcNow - _pointerDownTime).TotalMilliseconds;
-        var totalDistance = Math.Abs(offset - _startOffset);
-
-        // Treat as a tap if it never crossed the drag threshold, OR it was fast enough
-        // and short enough to almost certainly be a tap despite minor touch jitter.
-        var isTap = !_dragMoved || (elapsedMs < QuickTapMs && totalDistance < QuickTapMaxDistance);
-
-        if (isTap)
-        {
-            // If the row was already revealed, tapping it just closes it again
-            // (matches native SwipeView "tap elsewhere to close"). Otherwise it's a
-            // request to edit this transaction.
-            if (offset < -1)
-            {
-                _offsets[id] = 0;
-            }
-            else
-            {
-                OpenEdit(item.Id);
-            }
-        }
-        else
-        {
-            _offsets[id] = offset < -SnapThreshold ? RevealOffset : 0;
-        }
-
-        _draggingId = null;
-    }
-
-    private void OnPointerCancel()
-    {
-        if (_draggingId is int id) _offsets[id] = _startOffset;
-        _draggingId = null;
-    }
-
     private async Task DeleteExpense(int expenseId)
     {
         await ExpenseRepository.DeleteAsync(expenseId);
-        _offsets.Remove(expenseId);
         await LoadAsync();
     }
 

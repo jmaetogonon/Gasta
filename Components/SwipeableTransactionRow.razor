@@ -1,0 +1,103 @@
+@* Usage: <SwipeableTransactionRow Item="item" OnTap="OpenEdit" OnDelete="DeleteExpense" /> *@
+@inject IJSRuntime JS
+
+<div class="transaction-row-wrap">
+    <div class="delete-action" @onclick="() => OnDelete.InvokeAsync(Item.Id)">🗑 Delete</div>
+
+    <div class="transaction-row" @ref="_rowRef"
+         style="transform:translateX(@(_offset.ToString(System.Globalization.CultureInfo.InvariantCulture))px);"
+         @onpointerdown="OnPointerDown"
+         @onpointermove="OnPointerMove"
+         @onpointerup="OnPointerUp"
+         @onpointercancel="OnPointerCancel">
+        <div class="tx-icon" style="background:@Item.CategoryColorKey;">
+            <img src="images/categories/@(Item.CategoryLogo).png" />
+        </div>
+        <div class="tx-info">
+            <span class="tx-category">@Item.CategoryName</span>
+            @if (!string.IsNullOrWhiteSpace(Item.Notes))
+            {
+                <span class="tx-notes">@Item.Notes</span>
+            }
+            <span class="tx-date">@Item.Date.ToString("MMM d")</span>
+        </div>
+        <strong class="tx-amount">@Item.Amount.ToString("₱#,##0.00")</strong>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public Gasta.Services.ExpenseListItem Item { get; set; } = default!;
+    [Parameter] public EventCallback<int> OnTap { get; set; }
+    [Parameter] public EventCallback<int> OnDelete { get; set; }
+
+    private ElementReference _rowRef;
+    private double _offset;
+    private double _startX;
+    private double _startOffset;
+    private bool _dragging;
+    private bool _dragMoved;
+    private DateTime _pointerDownTime;
+
+    private const double RevealOffset = -84;   // matches .delete-action width
+    private const double DragThreshold = 12;   // px before it counts as a drag, not a tap
+    private const double SnapThreshold = 40;   // px dragged before snapping fully open/closed
+    private const double QuickTapMs = 300;     // fast release, even with minor movement, is still a tap
+    private const double QuickTapMaxDistance = 20;
+
+    private async Task OnPointerDown(PointerEventArgs e)
+    {
+        _dragging = true;
+        _startX = e.ClientX;
+        _startOffset = _offset;
+        _dragMoved = false;
+        _pointerDownTime = DateTime.UtcNow;
+
+        // Without this, the browser doesn't guarantee pointerup fires on THIS element —
+        // real touchscreens have enough sub-pixel jitter during a "still" tap that the
+        // release can land over a different element, silently swallowing the tap.
+        // Capturing locks every subsequent event of this gesture back to this element.
+        await JS.InvokeVoidAsync("gastaPointer.capture", _rowRef, e.PointerId);
+    }
+
+    private void OnPointerMove(PointerEventArgs e)
+    {
+        if (!_dragging) return;
+
+        var dx = e.ClientX - _startX;
+        if (Math.Abs(dx) > DragThreshold) _dragMoved = true;
+
+        _offset = Math.Clamp(_startOffset + dx, RevealOffset, 0);
+    }
+
+    private async Task OnPointerUp(PointerEventArgs e)
+    {
+        if (!_dragging) return;
+        _dragging = false;
+
+        var elapsedMs = (DateTime.UtcNow - _pointerDownTime).TotalMilliseconds;
+        var totalDistance = Math.Abs(_offset - _startOffset);
+        var isTap = !_dragMoved || (elapsedMs < QuickTapMs && totalDistance < QuickTapMaxDistance);
+
+        if (isTap)
+        {
+            if (_offset < -1)
+            {
+                _offset = 0;
+            }
+            else
+            {
+                await OnTap.InvokeAsync(Item.Id);
+            }
+        }
+        else
+        {
+            _offset = _offset < -SnapThreshold ? RevealOffset : 0;
+        }
+    }
+
+    private void OnPointerCancel()
+    {
+        if (_dragging) _offset = _startOffset;
+        _dragging = false;
+    }
+}
