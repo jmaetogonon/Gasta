@@ -22,12 +22,12 @@
     <link rel="icon" type="image/png" href="gasta.png" />
     <link href="Gasta.styles.css" rel="stylesheet" />
     <link href="manifest.webmanifest" rel="manifest" />
-    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="gasta.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="gasta.png" />
     <script type="importmap"></script>
 </head>
 
-<body> 
+<body>
     <div id="app">
         <div class="loading-screen">
             <div class="loading-ring-wrap">
@@ -56,7 +56,25 @@
     <script src="js/theme.js"></script>
     <script src="js/pointer.js"></script>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
-    <script>navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });</script>
+    <!--<script>navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });</script>-->
+
+    <script>
+        navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });
+
+        // Without this, even after the new worker takes over (skipWaiting +
+        // clients.claim in service-worker.published.js), an already-open tab keeps
+        // running on the old cached JS/WASM/CSS already loaded into memory — this
+        // reloads once, automatically, when control actually changes hands, so the
+        // tab picks up the new version instead of sitting in a stale/mixed state.
+        // hasReloaded guards against a reload loop, since controllerchange can in
+        // some browsers fire more than once for a single update.
+        let hasReloaded = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (hasReloaded) return;
+            hasReloaded = true;
+            window.location.reload();
+        });
+    </script>
 </body>
 
 </html>

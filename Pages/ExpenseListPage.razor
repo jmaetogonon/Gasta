@@ -16,7 +16,7 @@
 
     <div class="header-actions">
         <button class="icon-btn" @onclick="OnEditPaymentMethod">&#9998;</button>
-        <button class="icon-btn" @onclick="GoBack">&#10005;</button>
+        @* <button class="icon-btn" @onclick="GoBack">&#10005;</button> *@
     </div>
 </div>
 
@@ -79,5 +79,5 @@
         await Alert.ShowAsync("Editing payment methods is coming soon.", "Coming Soon");
     }
 
-    private void GoBack() => Nav.NavigateTo("/");
+    private void GoBack() => Nav.NavigateTo("");
 }
