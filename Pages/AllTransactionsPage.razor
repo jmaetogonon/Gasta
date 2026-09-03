@@ -28,29 +28,7 @@
     }
     @foreach (var item in Transactions)
     {
-        <div class="transaction-row-wrap">
-            <div class="delete-action" @onclick="() => DeleteExpense(item.Id)">🗑 Delete</div>
-
-            <div class="transaction-row"
-                 style="transform:translateX(@(GetOffset(item.Id).ToString(System.Globalization.CultureInfo.InvariantCulture))px);"
-                 @onpointerdown="e => OnPointerDown(e, item.Id)"
-                 @onpointermove="OnPointerMove"
-                 @onpointerup="e => OnPointerUp(item)"
-                 @onpointercancel="OnPointerCancel">
-                <div class="tx-icon" style="background:@item.CategoryColorKey;">
-                    <img src="images/categories/@(item.CategoryLogo).png" />
-                </div>
-                <div class="tx-info">
-                    <span class="tx-category">@item.CategoryName</span>
-                    @if (!string.IsNullOrWhiteSpace(item.Notes))
-                    {
-                        <span class="tx-notes">@item.Notes</span>
-                    }
-                    <span class="tx-date">@item.Date.ToString("MMM d")</span>
-                </div>
-                <strong class="tx-amount">@item.Amount.ToString("₱#,##0.00")</strong>
-            </div>
-        </div>
+        <SwipeableTransactionRow Item="item" OnTap="OpenEdit" OnDelete="DeleteExpense" />
     }
 </div>
 
@@ -60,18 +38,6 @@
     private DateTime SelectedMonth = DateTime.Now;
     private List<Gasta.Services.ExpenseListItem> Transactions = new();
     private decimal Total;
-
-    // --- Swipe-to-reveal-delete state, same pattern as ExpenseListPage/Stats.
-    // Intentionally duplicated rather than extracted — matches the project's documented
-    // decision to defer that refactor rather than destabilize working pages mid-build. ---
-    private readonly Dictionary<int, double> _offsets = new();
-    private int? _draggingId;
-    private double _startX;
-    private double _startOffset;
-    private bool _dragMoved;
-    private const double RevealOffset = -84;
-    private const double DragThreshold = 8;
-    private const double SnapThreshold = 40;
 
     private bool ShowEdit;
     private int EditingExpenseId;
@@ -87,64 +53,18 @@
     private async Task PreviousMonth() { SelectedMonth = SelectedMonth.AddMonths(-1); await LoadAsync(); }
     private async Task NextMonth() { SelectedMonth = SelectedMonth.AddMonths(1); await LoadAsync(); }
 
-    private double GetOffset(int id) => _offsets.TryGetValue(id, out var v) ? v : 0;
-
-    private void OnPointerDown(PointerEventArgs e, int id)
+    private void OpenEdit(int expenseId)
     {
-        _draggingId = id;
-        _startX = e.ClientX;
-        _startOffset = GetOffset(id);
-        _dragMoved = false;
-    }
-
-    private void OnPointerMove(PointerEventArgs e)
-    {
-        if (_draggingId is not int id) return;
-        var dx = e.ClientX - _startX;
-        if (Math.Abs(dx) > DragThreshold) _dragMoved = true;
-        _offsets[id] = Math.Clamp(_startOffset + dx, RevealOffset, 0);
-    }
-
-    private void OnPointerUp(Gasta.Services.ExpenseListItem item)
-    {
-        if (_draggingId != item.Id) { _draggingId = null; return; }
-
-        var id = item.Id;
-        var offset = GetOffset(id);
-
-        if (!_dragMoved)
-        {
-            if (offset < -1)
-            {
-                _offsets[id] = 0;
-            }
-            else
-            {
-                EditingExpenseId = item.Id;
-                ShowEdit = true;
-            }
-        }
-        else
-        {
-            _offsets[id] = offset < -SnapThreshold ? RevealOffset : 0;
-        }
-
-        _draggingId = null;
-    }
-
-    private void OnPointerCancel()
-    {
-        if (_draggingId is int id) _offsets[id] = _startOffset;
-        _draggingId = null;
+        EditingExpenseId = expenseId;
+        ShowEdit = true;
     }
 
     private async Task DeleteExpense(int expenseId)
     {
-        var confirmed = await Alert.ShowConfirmAsync("Delete this transaction?", "Confirm Delete");
-        if (!confirmed) return;
+        // var confirmed = await Alert.ShowConfirmAsync("Delete this transaction?", "Confirm Delete");
+        // if (!confirmed) return;
 
         await ExpenseRepository.DeleteAsync(expenseId);
-        _offsets.Remove(expenseId);
         await LoadAsync();
     }
 

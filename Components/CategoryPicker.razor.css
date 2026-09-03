@@ -26,11 +26,11 @@
     transform: translateY(100%);
     transition: transform 0.28s ease;
     z-index: 26;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
 }
 
     .picker-sheet.open {
         transform: translateY(0);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
     }
 
 .picker-title {
