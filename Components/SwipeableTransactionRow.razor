@@ -9,7 +9,8 @@
          @onpointerdown="OnPointerDown"
          @onpointermove="OnPointerMove"
          @onpointerup="OnPointerUp"
-         @onpointercancel="OnPointerCancel">
+         @onpointercancel="OnPointerCancel"
+         @onclick="OnClick">
         <div class="tx-icon" style="background:@Item.CategoryColorKey;">
             <img src="images/categories/@(Item.CategoryLogo).png" />
         </div>
@@ -36,13 +37,10 @@
     private double _startOffset;
     private bool _dragging;
     private bool _dragMoved;
-    private DateTime _pointerDownTime;
 
     private const double RevealOffset = -84;   // matches .delete-action width
-    private const double DragThreshold = 12;   // px before it counts as a drag, not a tap
+    private const double DragThreshold = 10;   // px before it counts as a real drag
     private const double SnapThreshold = 40;   // px dragged before snapping fully open/closed
-    private const double QuickTapMs = 300;     // fast release, even with minor movement, is still a tap
-    private const double QuickTapMaxDistance = 20;
 
     private async Task OnPointerDown(PointerEventArgs e)
     {
@@ -50,12 +48,11 @@
         _startX = e.ClientX;
         _startOffset = _offset;
         _dragMoved = false;
-        _pointerDownTime = DateTime.UtcNow;
 
-        // Without this, the browser doesn't guarantee pointerup fires on THIS element —
-        // real touchscreens have enough sub-pixel jitter during a "still" tap that the
-        // release can land over a different element, silently swallowing the tap.
-        // Capturing locks every subsequent event of this gesture back to this element.
+        // Keeps the drag tracking smooth if the finger moves fast/far — not the fix
+        // for tap reliability (that's the native click event below), just makes the
+        // swipe gesture itself feel consistent regardless of what's visually under
+        // the finger as it moves.
         await JS.InvokeVoidAsync("gastaPointer.capture", _rowRef, e.PointerId);
     }
 
@@ -69,29 +66,43 @@
         _offset = Math.Clamp(_startOffset + dx, RevealOffset, 0);
     }
 
-    private async Task OnPointerUp(PointerEventArgs e)
+    private void OnPointerUp(PointerEventArgs e)
     {
         if (!_dragging) return;
         _dragging = false;
 
-        var elapsedMs = (DateTime.UtcNow - _pointerDownTime).TotalMilliseconds;
-        var totalDistance = Math.Abs(_offset - _startOffset);
-        var isTap = !_dragMoved || (elapsedMs < QuickTapMs && totalDistance < QuickTapMaxDistance);
-
-        if (isTap)
+        if (_dragMoved)
         {
-            if (_offset < -1)
-            {
-                _offset = 0;
-            }
-            else
-            {
-                await OnTap.InvokeAsync(Item.Id);
-            }
+            // Snap fully open or closed based on how far it was dragged. If this
+            // WASN'T a drag, deliberately do nothing here — the browser's native
+            // click event (fired right after, for a plain tap) handles that case
+            // below in OnClick. Native click already correctly distinguishes a tap
+            // from a scroll/drag on real touch hardware; re-deriving that ourselves
+            // from raw pointer timing/distance is exactly what kept failing before.
+            _offset = _offset < -SnapThreshold ? RevealOffset : 0;
+        }
+    }
+
+    private async Task OnClick()
+    {
+        // A genuine drag was already handled in OnPointerUp above. Browsers can
+        // still fire a trailing click after a small drag in some cases, so guard
+        // against double-handling it here.
+        if (_dragMoved)
+        {
+            _dragMoved = false;
+            return;
+        }
+
+        if (_offset < -1)
+        {
+            // Row is currently revealed — a tap on it just closes it again,
+            // matching native SwipeView's "tap elsewhere to close" behavior.
+            _offset = 0;
         }
         else
         {
-            _offset = _offset < -SnapThreshold ? RevealOffset : 0;
+            await OnTap.InvokeAsync(Item.Id);
         }
     }
 
