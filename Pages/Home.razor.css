@@ -19,244 +19,405 @@
 .month-switcher {
     display: flex;
     align-items: center;
+    gap: 14px;
     border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 8px 14px;
+    border-radius: 20px;
+    padding: 10px 18px;
     background: var(--surface);
 }
 
     .month-switcher span {
         cursor: pointer;
         color: var(--text-secondary);
-        font-size: 0.75rem;
-        width: 28px;
+        font-size: 12px;
     }
 
-.screen-title {
-    font-size: 0.75rem;
-    opacity: 0.55;
-}
+    .month-switcher strong {
+        font-size: 13px;
+        letter-spacing: 0.4px;
+    }
 
-.card {
+/* Monthly Overview card */
+.overview-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg, 20px);
-    padding: 16px;
-    color: var(--text-primary);
+    padding: 18px;
     box-shadow: var(--shadow-card);
+    margin-top: 16px;
 }
 
-.ghost-button {
-    background: transparent;
-    border: 1.5px solid var(--color-primary);
-    color: var(--color-primary);
-    border-radius: 12px;
-    padding: 8px;
-    font-weight: 600;
+.eyebrow {
+    display: block;
     font-size: 0.625rem;
-    cursor: pointer;
+    color: var(--text-secondary);
+    letter-spacing: 0.6px;
 }
 
-.amount-display {
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin: 6px 0;
-}
-
-.progress-track {
-    height: 8px;
-    background: var(--surface-alt);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background: var(--color-primary);
-    border-radius: 4px;
-    transition: width 0.3s ease;
-}
-
-.budget-row {
+.overview-top {
     display: flex;
     justify-content: space-between;
-    margin-top: 12px;
+    align-items: flex-start;
+    gap: 12px;
 }
 
-    .budget-row div {
+.overview-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.overview-illustration {
+    width: 114px;
+    height: 115px;
+    flex-shrink: 0;
+    margin-right: -8px;
+}
+
+.overview-illustration-dark {
+    width: 130px !important;
+    height: 105px;
+    flex-shrink: 0;
+    margin-right: -12px;
+    margin-top: 4px;
+}
+
+    .overview-label {
+        display: block;
+        font-size: 0.625rem;
+        color: var(--text-secondary);
+        margin-top: 8px;
+        opacity: 0.8;
+    }
+
+    .amount-display {
+        font-size: 1.5rem;
+        font-weight: 600;
+        font-family: var(--font-display);
+    }
+
+    .progress-track {
+        height: 7px;
+        background: var(--surface-alt);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--color-primary);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+
+    .progress-captions {
         display: flex;
-        flex-direction: column;
-        gap: 2px;
-        font-size: 0.688rem;
+        justify-content: space-between;
+        margin-top: 8px;
+        font-size: 0.625rem;
+        color: var(--text-secondary);
     }
 
-.caption {
-    color: var(--text-secondary);
-    font-size: 0.625rem;
-    font-family: var(--font-display);
-}
-
-.success {
-    color: var(--success);
-}
-
-.danger-text {
-    color: var(--danger);
-}
-
-.tabs {
-    display: flex;
-    gap: 18px;
-    align-items: center;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 4px;
-}
-
-.tab {
-    position: relative;
-    font-size: 0.813rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding-bottom: 4px;
-}
-
-    .tab.active {
-        color: var(--color-primary);
+    .overview-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 14px 0;
     }
 
-        .tab.active::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: -6px;
-            height: 3px;
-            border-radius: 1px;
-            background: var(--color-primary);
+    .budget-row {
+        display: flex;
+        justify-content: space-between;
+    }
+
+        .budget-row div {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 0.688rem;
         }
 
-.view-toggle {
-    margin-left: auto;
-    width: 42px;
-    text-align: end;
-    height: 100%;
-}
-
-.view-icon svg {
-    color: var(--text-secondary);
-    cursor: pointer;
-    margin-bottom: 4px;
-}
-
-.payment-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 14px;
-}
-
-.payment-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: 14px;
-    cursor: pointer;
-    background: var(--surface);
-    box-shadow: var(--shadow-chip);
-}
-
-.payment-row-logo {
-    height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-    .payment-row-logo img {
-        height: 20px;
+    .caption {
+        color: var(--text-secondary);
+        font-size: 0.625rem;
+        font-family: var(--font-display);
     }
 
-.payment-row-amount {
-    font-size: 0.813rem;
-    font-weight: 600;
-    margin-left: auto;
-}
+        .caption.over-budget {
+            color: var(--danger);
+        }
 
-.chip-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 14px;
-}
-
-.chip {
-    border-radius: 16px;
-    padding: 14px;
-    box-shadow: var(--shadow-chip);
-}
-
-    .chip img {
-        height: 24px;
-        max-width: 75%;
+    .success {
+        color: var(--success);
     }
 
-    .chip strong {
-        display: block;
-        margin-top: 8px;
-        font-size: 0.875rem;
+    .danger-text {
+        color: var(--danger);
     }
 
-.category-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-top: 14px;
-    text-align: center;
-}
+    .ghost-button {
+        background: transparent;
+        border: 1.5px solid var(--color-primary);
+        color: var(--color-primary);
+        border-radius: 12px;
+        padding: 8px;
+        font-weight: 600;
+        font-size: 0.625rem;
+        cursor: pointer;
+    }
+    /* Tabs */
+    .tabs {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 4px;
+        margin-top: 16px;
+    }
 
-.category-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-}
+    .tab {
+        position: relative;
+        font-size: 0.813rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding-bottom: 4px;
+    }
 
-.ring-wrap {
-    position: relative;
-    width: 64px;
-    height: 64px;
-}
+        .tab.active {
+            color: var(--color-primary);
+        }
 
-.ring-logo {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 38px;
-    max-height: 26px;
-}
+            .tab.active::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: -6px;
+                height: 3px;
+                border-radius: 1px;
+                background: var(--color-primary);
+            }
 
-.ring {
-    width: 64px;
-    height: 64px;
-    transform: rotate(-90deg);
-}
+    .view-toggle {
+        margin-left: auto;
+        width: 42px;
+        text-align: end;
+        height: 100%;
+    }
 
-.ring-track {
-    fill: none;
-    stroke-width: 8;
-    /* stroke color now set inline per-category via ColorHelper.Lighten(),
-       this is just a neutral fallback if that's ever omitted */
-    stroke: var(--surface-alt);
-}
+    .view-icon svg {
+        color: var(--text-secondary);
+        cursor: pointer;
+        margin-bottom: 4px;
+    }
+    /* Payments — grid */
+    .chip-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 14px;
+    }
 
-.ring-fill {
-    fill: none;
-    stroke-width: 8;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 0.3s ease;
-}
+    .chip {
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: var(--shadow-chip);
+    }
+
+        .chip img {
+            height: 24px;
+            max-width: 75%;
+        }
+
+        .chip strong {
+            display: block;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+    /* Payments — list */
+    .payment-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .payment-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        cursor: pointer;
+        background: var(--surface);
+        box-shadow: var(--shadow-chip);
+    }
+
+    .payment-row-logo {
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .payment-row-logo img {
+            height: 20px;
+        }
+
+    .payment-row-amount {
+        font-size: 0.813rem;
+        font-weight: 600;
+        margin-left: auto;
+    }
+    /* Categories — ring grid (existing view, now the alternate) */
+    .category-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 14px;
+        text-align: center;
+    }
+
+    .category-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .ring-wrap {
+        position: relative;
+        width: 82px;
+        height: 82px;
+    }
+
+    .ring-logo {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 44px;
+        max-height: 30px;
+    }
+
+    .ring {
+        width: 82px;
+        height: 82px;
+        transform: rotate(-90deg);
+    }
+
+    .ring-track {
+        fill: none;
+        stroke-width: 10;
+    }
+
+    .ring-fill {
+        fill: none;
+        stroke-width: 10;
+        stroke-linecap: round;
+        transition: stroke-dashoffset 0.3s ease;
+    }
+    /* Categories — list (new default view, matches reference).
+   ONE unified card with divider lines between rows, not separate floating cards.
+   Shadow lives on the WRAPPER (unclipped) and overflow:hidden lives on the inner
+   .category-list (to clip row corners/dividers into the rounded shape) — putting
+   both box-shadow and overflow:hidden on the same element clips the shadow itself,
+   since overflow:hidden clips anything rendered outside that element's own box. */
+    .category-list-wrap {
+        margin-top: 14px;
+        border-radius: 20px;
+        box-shadow: var(--shadow-soft);
+    }
+
+    .category-list {
+        display: flex;
+        flex-direction: column;
+        background: var(--surface);
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .category-list-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 8px 14px;
+        cursor: pointer;
+        border-bottom: 1px solid var(--border);
+    }
+
+        .category-list-row:last-child {
+            border-bottom: none;
+        }
+
+    .cat-list-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .cat-list-icon img {
+            max-width: 32px;
+            max-height: 18px;
+        }
+
+    .cat-list-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .cat-list-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .cat-list-name {
+        flex: 1;
+        font-weight: 600;
+        font-size: 0.75rem;
+        font-family: var(--font-display);
+    }
+
+    .cat-list-pct {
+        font-weight: 500;
+        font-size: 12px;
+        margin-right: 8px;
+        font-family: var(--font-display);
+    }
+
+    .chevron {
+        color: var(--text-secondary);
+        font-size: 11px;
+    }
+
+    .cat-list-track {
+        height: 5px;
+        background: var(--surface-alt);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 6px;
+    }
+
+    .cat-list-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    .cat-list-amounts {
+        font-size: 0.625rem;
+        color: var(--text-secondary);
+        font-family: var(--font-display);
+    }
+
+        .cat-list-amounts.over-budget {
+            color: var(--danger);
+            font-weight: 600;
+        }

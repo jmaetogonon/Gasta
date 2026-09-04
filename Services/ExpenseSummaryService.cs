@@ -32,23 +32,28 @@ public record MonthComparison(decimal Current, decimal Previous)
         : (double)Math.Abs((Current - Previous) / Previous * 100m);
 }
 
+public record CategoryBudgetRow(int CategoryId, string Name, string ColorKey, string LogoImage, decimal Amount);
+
 public class ExpenseSummaryService
 {
     private readonly IExpenseRepository _expenseRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IPaymentMethodRepository _paymentMethodRepository;
     private readonly IBudgetRepository _budgetRepository;
+    private readonly ICategoryBudgetRepository _categoryBudgetRepository;
 
     public ExpenseSummaryService(
         IExpenseRepository expenseRepository,
         ICategoryRepository categoryRepository,
         IPaymentMethodRepository paymentMethodRepository,
-        IBudgetRepository budgetRepository)
+        IBudgetRepository budgetRepository,
+        ICategoryBudgetRepository categoryBudgetRepository)
     {
         _expenseRepository = expenseRepository;
         _categoryRepository = categoryRepository;
         _paymentMethodRepository = paymentMethodRepository;
         _budgetRepository = budgetRepository;
+        _categoryBudgetRepository = categoryBudgetRepository;
     }
 
     public async Task<MonthSummary> GetMonthSummaryAsync(int year, int month)
@@ -62,12 +67,20 @@ public class ExpenseSummaryService
     {
         var categories = await _categoryRepository.GetActiveOrderedAsync();
         var expenses = await GetMonthExpensesAsync(year, month);
+        var budgets = await _categoryBudgetRepository.GetAllForMonthAsync(year, month);
 
         return categories
-            .Select(c => new SpendSummary(
-                c.Id, c.Name, c.ColorKey, c.LogoImage,
-                expenses.Where(e => e.CategoryId == c.Id).Sum(e => e.Amount),
-                c.MonthlyBudget))
+            .Select(c =>
+            {
+                // No fallback — a category with no CategoryBudget row for this specific
+                // month simply has 0 budgeted. Nothing carries forward automatically;
+                // that's an explicit user action (see CopyBudgetsFromPreviousMonthAsync).
+                var budget = budgets.FirstOrDefault(b => b.CategoryId == c.Id)?.Amount ?? 0;
+                return new SpendSummary(
+                    c.Id, c.Name, c.ColorKey, c.LogoImage,
+                    expenses.Where(e => e.CategoryId == c.Id).Sum(e => e.Amount),
+                    budget);
+            })
             .ToList();
     }
 
@@ -115,6 +128,46 @@ public class ExpenseSummaryService
 
     public Task SetMonthlyBudgetAsync(int year, int month, decimal amount) =>
         _budgetRepository.SetForMonthAsync(year, month, amount);
+
+    /// <summary>
+    /// Every category with its budget for the given month (0 if nothing has been set
+    /// for that specific month — no fallback default) — used by the "Set Your Monthly
+    /// Budget" page's Category Budgets list.
+    /// </summary>
+    public async Task<List<CategoryBudgetRow>> GetCategoryBudgetRowsAsync(int year, int month)
+    {
+        var categories = await _categoryRepository.GetActiveOrderedAsync();
+        var budgets = await _categoryBudgetRepository.GetAllForMonthAsync(year, month);
+
+        return categories
+            .Select(c =>
+            {
+                var amount = budgets.FirstOrDefault(b => b.CategoryId == c.Id)?.Amount ?? 0;
+                return new CategoryBudgetRow(c.Id, c.Name, c.ColorKey, c.LogoImage, amount);
+            })
+            .ToList();
+    }
+
+    /// <summary>
+    /// Sets a category's budget for ONE specific month only — CategoryBudget is the
+    /// sole source of truth, so this doesn't touch any other month.
+    /// </summary>
+    public Task SetCategoryBudgetAsync(int categoryId, int year, int month, decimal amount) =>
+        _categoryBudgetRepository.SetForCategoryMonthAsync(categoryId, year, month, amount);
+
+    /// <summary>
+    /// Reads (without writing anything) the previous month's overall budget and every
+    /// category's budget — used by the Manage Budget page's explicit "Copy from Last
+    /// Month" action. Nothing is persisted here; the caller applies these to its local
+    /// editing state and the user still has to hit Save, same as any other edit.
+    /// </summary>
+    public async Task<(decimal OverallBudget, List<CategoryBudgetRow> CategoryBudgets)> GetPreviousMonthBudgetsAsync(int year, int month)
+    {
+        var prevAnchor = new DateTime(year, month, 1).AddMonths(-1);
+        var prevBudget = await _budgetRepository.GetForMonthAsync(prevAnchor.Year, prevAnchor.Month);
+        var prevCategoryRows = await GetCategoryBudgetRowsAsync(prevAnchor.Year, prevAnchor.Month);
+        return (prevBudget?.Amount ?? 0, prevCategoryRows);
+    }
 
     /// <summary>Current month's total vs the previous month's total, for the Stats page comparison badge.</summary>
     public async Task<MonthComparison> GetMonthOverMonthAsync(int year, int month)

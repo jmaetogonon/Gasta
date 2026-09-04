@@ -104,9 +104,9 @@
         font-family: inherit;
     }
 
-    .field-input[type="date"] {
-        color-scheme: light;
-    }
+.field-input[type="date"] {
+    color-scheme: light;
+}
 
 [data-theme="dark"] .field-input[type="date"] {
     color-scheme: dark;
@@ -123,6 +123,31 @@
     font-weight: normal;
 }
 
+.remaining-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding: 10px 4px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.remaining-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.remaining-amount {
+    font-weight: bold;
+    font-size: 13px;
+    color: var(--success);
+}
+
+    .remaining-amount.danger-text {
+        color: var(--danger);
+    }
+
 .chip-wrap {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -134,7 +159,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 48px;
+    height: 54px;
     border-radius: 14px;
     padding: 6px;
     background: var(--LogoChipBackground, #ffffff);
@@ -180,9 +205,9 @@
     flex: 1;
     padding: 14px;
     border-radius: 14px;
+    font-weight: bold;
     font-size: 15px;
     cursor: pointer;
-    font-family: var(--font-display);
 }
 
 .save-button {

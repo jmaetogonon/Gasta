@@ -4,7 +4,6 @@
 @using Gasta.Helpers
 @inject Gasta.Data.Repositories.IExpenseRepository ExpenseRepository
 @inject Gasta.Data.Repositories.IPaymentMethodRepository PaymentMethodRepository
-@inject Gasta.Data.Repositories.ICategoryRepository CategoryRepository
 @inject Gasta.Services.ThemeService ThemeService
 
 <div class="sheet-scrim @(IsOpen ? "open" : "")" @onclick="Cancel"></div>
@@ -23,7 +22,7 @@
                    @onchange="OnDateChanged" />
 
             <label class="field-label">Expense</label>
-            <div class="field-input tappable" @onclick="() => OpenKeypad(KeypadTarget.Amount)">
+            <div class="field-input tappable" @onclick="() => ShowKeypad = true">
                 @if (Amount <= 0)
                 {
                     <span class="placeholder-text">Tap to enter amount</span>
@@ -51,17 +50,11 @@
                 }
             </div>
 
-            <label class="field-label">Set Budget (@Category.Name)</label>
-            <div class="field-input tappable" @onclick="() => OpenKeypad(KeypadTarget.Budget)">
-                @if (CategoryBudget <= 0)
-                {
-                    <span class="placeholder-text">Tap to enter budget</span>
-                }
-                else
-                {
-                    <span>@CategoryBudget.ToString("₱#,##0.00")</span>
-                }
-                <span class="chevron">&#10095;</span>
+            <div class="remaining-row">
+                <span class="remaining-label">Remaining Budget (@Category.Name)</span>
+                <span class="remaining-amount @(RemainingBudget < 0 ? "danger-text" : "")">
+                    @RemainingBudget.ToString("₱#,##0.00")
+                </span>
             </div>
 
             <label class="field-label">Notes</label>
@@ -81,9 +74,7 @@
     }
 </div>
 
-<NumericKeypad @bind-IsOpen="ShowKeypad"
-                InitialValue="@(_keypadTarget == KeypadTarget.Amount ? Amount : CategoryBudget)"
-                OnConfirmed="OnKeypadConfirmed" />
+<NumericKeypad @bind-IsOpen="ShowKeypad" InitialValue="Amount" OnConfirmed="v => Amount = v" />
 
 @code {
     [Parameter] public bool IsOpen { get; set; }
@@ -95,15 +86,16 @@
     private bool ShowKeypad;
     private DateTime Date = DateTime.Now;
     private decimal Amount;
-    private decimal CategoryBudget;
     private int? SelectedPaymentMethodId;
     private string Notes = "";
     private List<Gasta.Models.PaymentMethod> PaymentMethods = new();
 
-    private enum KeypadTarget { Amount, Budget }
-    private KeypadTarget _keypadTarget = KeypadTarget.Amount;
-
     private bool CanSave => Amount > 0 && SelectedPaymentMethodId.HasValue && Category is not null;
+
+    // Informational only — how much of this category's budget is left BEFORE this new
+    // expense is applied (matches the figures already shown on Home's dashboard).
+    // Editing the budget itself now happens exclusively on the Manage Budget page.
+    private decimal RemainingBudget => (Category?.Budget ?? 0) - (Category?.Spent ?? 0);
 
     protected override async Task OnParametersSetAsync()
     {
@@ -112,7 +104,6 @@
             // Fresh entry every time the sheet opens, same as MAUI's per-open ViewModel.
             Date = DateTime.Now;
             Amount = 0;
-            CategoryBudget = Category?.Budget ?? 0;
             SelectedPaymentMethodId = null;
             Notes = "";
             ShowKeypad = false;
@@ -125,24 +116,10 @@
         _wasOpen = IsOpen;
     }
 
-    private void OpenKeypad(KeypadTarget target)
-    {
-        _keypadTarget = target;
-        ShowKeypad = true;
-    }
-
     private void OnDateChanged(ChangeEventArgs e)
     {
         if (DateTime.TryParse(e.Value?.ToString(), out var d))
             Date = d;
-    }
-
-    private void OnKeypadConfirmed(decimal value)
-    {
-        if (_keypadTarget == KeypadTarget.Amount)
-            Amount = value;
-        else
-            CategoryBudget = value;
     }
 
     private async Task Save()
@@ -158,16 +135,6 @@
             Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes
         };
         await ExpenseRepository.SaveAsync(expense);
-
-        if (CategoryBudget != Category.Budget)
-        {
-            var categoryModel = await CategoryRepository.GetByIdAsync(Category.Id);
-            if (categoryModel is not null)
-            {
-                categoryModel.MonthlyBudget = CategoryBudget;
-                await CategoryRepository.SaveAsync(categoryModel);
-            }
-        }
 
         await OnSaved.InvokeAsync();
         await Close();

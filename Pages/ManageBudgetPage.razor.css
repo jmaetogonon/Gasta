@@ -1,0 +1,249 @@
+/* Three regions: fixed top (header + Monthly Budget), scrollable middle (Category
+   Budgets list), fixed bottom (Save/Cancel — always reachable without scrolling).
+   130px = MainLayout.razor.css's .app-content padding (20 top + 110 bottom, reserved
+   for the full-width nav) — if that padding ever changes, this needs to match it. */
+.budget-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 130px);
+}
+
+.budget-fixed-top {
+    flex-shrink: 0;
+}
+
+.budget-scroll {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px;
+}
+
+.budget-fixed-bottom {
+    flex-shrink: 0;
+    padding-top: 12px;
+}
+
+.header-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface-alt);
+    color: var(--text-primary);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.header-title {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.intro-text {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin: 8px 0 14px;
+    line-height: 1.4;
+}
+
+.past-months-button {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1.5px solid var(--color-primary);
+    color: var(--color-primary);
+    border-radius: 12px;
+    padding: 11px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    margin-bottom: 16px;
+}
+
+.field-label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.field-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 14px;
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
+    font-size: 15px;
+}
+
+    .field-input.tappable {
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+.chevron {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.section {
+    margin-top: 4px;
+}
+
+.section-title {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.allocated-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-soft);
+}
+
+.allocated-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.allocated-amount {
+    font-weight: bold;
+    font-size: 13px;
+}
+
+    .allocated-amount.over {
+        color: var(--danger);
+    }
+
+/* Unified card with divider lines, matching Home's category list. Shadow lives on
+   the wrapper (unclipped); overflow:hidden lives on the inner list (to clip row
+   corners) — same box-shadow/overflow:hidden split as Home.razor.css, since putting
+   both on the same element clips the shadow along with the content. */
+.category-list-wrap {
+    border-radius: 20px;
+    box-shadow: var(--shadow-card);
+}
+
+.category-list {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.category-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+}
+
+    .category-row:last-child {
+        border-bottom: none;
+    }
+
+.cat-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+    .cat-icon img {
+        width: 22px;
+        height: 22px;
+    }
+
+.cat-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.cat-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cat-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.cat-amount {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.cat-track {
+    height: 5px;
+    background: var(--surface-alt);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.cat-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.action-row {
+    display: flex;
+    gap: 10px;
+}
+
+.save-button, .cancel-button {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.save-button {
+    background: var(--color-primary);
+    color: white;
+}
+
+.cancel-button {
+    background: var(--surface-alt);
+    color: var(--text-secondary);
+}
