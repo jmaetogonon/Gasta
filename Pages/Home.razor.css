@@ -19,21 +19,21 @@
 .month-switcher {
     display: flex;
     align-items: center;
-    gap: 14px;
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 10px 18px;
+    border-radius: 18px;
+    padding: 8px 14px;
     background: var(--surface);
 }
 
     .month-switcher span {
         cursor: pointer;
         color: var(--text-secondary);
-        font-size: 12px;
+        font-size: 0.75rem;
+        width: 28px;
     }
 
     .month-switcher strong {
-        font-size: 13px;
+        font-size: 0.813rem;
         letter-spacing: 0.4px;
     }
 
@@ -232,7 +232,7 @@
         .chip strong {
             display: block;
             margin-top: 8px;
-            font-size: 14px;
+            font-size: 0.875rem;
         }
     /* Payments — list */
     .payment-list {
@@ -385,17 +385,17 @@
         font-family: var(--font-display);
     }
 
-    .cat-list-pct {
-        font-weight: 500;
-        font-size: 12px;
-        margin-right: 8px;
-        font-family: var(--font-display);
-    }
+.cat-list-pct {
+    font-weight: 500;
+    font-size: 0.75rem;
+    margin-right: 8px;
+    font-family: var(--font-display);
+}
 
-    .chevron {
-        color: var(--text-secondary);
-        font-size: 11px;
-    }
+.chevron {
+    color: var(--text-secondary);
+    font-size: 0.688rem;
+}
 
     .cat-list-track {
         height: 5px;

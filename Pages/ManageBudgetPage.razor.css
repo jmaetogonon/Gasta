@@ -5,7 +5,7 @@
 .budget-page {
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 130px);
+    height: calc(100dvh - 120px);
 }
 
 .budget-fixed-top {
@@ -17,6 +17,7 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 12px;
+    margin-top: 16px;
 }
 
 .budget-fixed-bottom {
@@ -66,15 +67,16 @@
     color: var(--color-primary);
     border-radius: 12px;
     padding: 11px;
-    font-weight: 600;
-    font-size: 12px;
+    font-weight: 500;
+    font-size: 0.75rem;
     cursor: pointer;
     margin-bottom: 16px;
+    font-family: var(--font-display);
 }
 
 .field-label {
     display: block;
-    font-size: 11px;
+    font-size: 0.688rem;
     color: var(--text-secondary);
     margin-bottom: 6px;
 }
@@ -87,20 +89,21 @@
     padding: 13px 14px;
     background: var(--surface);
     box-shadow: var(--shadow-soft);
-    font-size: 15px;
+    font-size: 0.938rem;
 }
 
     .field-input.tappable {
         cursor: pointer;
-        font-weight: bold;
+        font-weight: 600;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        font-family: var(--font-display);
     }
 
 .chevron {
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: normal;
 }
 
@@ -126,6 +129,7 @@
     padding: 12px 14px;
     margin-bottom: 14px;
     box-shadow: var(--shadow-soft);
+    margin: 0px 10px 14px 10px;
 }
 
 .allocated-label {
@@ -134,8 +138,9 @@
 }
 
 .allocated-amount {
-    font-weight: bold;
-    font-size: 13px;
+    font-weight: 500;
+    font-size: 0.813rem;
+    font-family: var(--font-display);
 }
 
     .allocated-amount.over {
@@ -148,7 +153,8 @@
    both on the same element clips the shadow along with the content. */
 .category-list-wrap {
     border-radius: 20px;
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-chip);
+    margin: 0px 10px;
 }
 
 .category-list {
@@ -163,7 +169,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 14px;
+    padding: 12px 14px;
     cursor: pointer;
     border-bottom: 1px solid var(--border);
 }
@@ -183,8 +189,8 @@
 }
 
     .cat-icon img {
-        width: 22px;
-        height: 22px;
+        max-width: 24px;
+        max-height: 22px;
     }
 
 .cat-info {
@@ -200,13 +206,15 @@
 
 .cat-name {
     flex: 1;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 0.813rem;
+    font-weight: 500;
+    font-family: var(--font-display);
 }
 
 .cat-amount {
-    font-size: 13px;
-    font-weight: bold;
+    font-size: 0.813rem;
+    font-weight: 500;
+    font-family: var(--font-display);
 }
 
 .cat-track {
@@ -214,7 +222,7 @@
     background: var(--surface-alt);
     border-radius: 3px;
     overflow: hidden;
-    margin-top: 8px;
+    margin-top: 2px;
 }
 
 .cat-fill {
@@ -233,9 +241,10 @@
     padding: 14px;
     border: none;
     border-radius: 14px;
-    font-weight: bold;
-    font-size: 15px;
+    font-weight: 500;
+    font-size: 0.875rem;
     cursor: pointer;
+    font-family: var(--font-display);
 }
 
 .save-button {

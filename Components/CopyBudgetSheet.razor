@@ -14,7 +14,7 @@
     <div class="month-switcher">
         <span @onclick="PreviousMonth">&#10094;</span>
         <strong>@SelectedMonth.ToString("MMMM yyyy").ToUpper()</strong>
-        <span class="@(CanGoNext ? "" : "disabled")" @onclick="NextMonth">&#10095;</span>
+        <span style="text-align:end;" class="@(CanGoNext ? "" : "disabled")" @onclick="NextMonth">&#10095;</span>
     </div>
 
     <div class="preview-list-wrap">
@@ -32,7 +32,7 @@
                 @foreach (var row in PreviewRows)
                 {
                     <div class="preview-row">
-                        <div class="preview-icon" style="background:@row.ColorKey;">
+                        <div class="preview-icon" style="background:@ColorHelper.Lighten(row.ColorKey, 0.75);">
                             <img src="images/categories/@(row.LogoImage).png" />
                         </div>
                         <span class="preview-name">@row.Name</span>

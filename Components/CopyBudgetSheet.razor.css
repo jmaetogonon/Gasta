@@ -76,8 +76,7 @@
 .month-switcher {
     display: flex;
     justify-content: center;
-    gap: 16px;
-    align-items: center;
+     align-items: center;
     border: 1px solid var(--border);
     border-radius: 18px;
     padding: 10px 14px;
@@ -89,6 +88,7 @@
         cursor: pointer;
         color: var(--text-secondary);
         font-size: 12px;
+        width: 28px;
     }
 
         .month-switcher span.disabled {
@@ -137,20 +137,22 @@
 }
 
     .preview-icon img {
-        width: 16px;
-        height: 16px;
+        max-width: 16px;
+        max-height: 16px;
     }
 
 .preview-name {
     flex: 1;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 500;
+    font-family: var(--font-display);
 }
 
 .preview-amount {
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 500;
     color: var(--text-secondary);
+    font-family: var(--font-display);
 }
 
 .empty-state {
@@ -182,9 +184,10 @@
     padding: 13px;
     border: none;
     border-radius: 14px;
-    font-weight: bold;
-    font-size: 14px;
+    font-weight: 500;
+    font-size: 0.875rem;
     cursor: pointer;
+    font-family: var(--font-display);
 }
 
 .close-button {

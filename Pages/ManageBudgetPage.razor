@@ -41,7 +41,7 @@
                         var amount = GetAmount(row.CategoryId);
                         var pct = (amount <= 0 || MonthlyBudget <= 0) ? 0 : (double)(amount / MonthlyBudget * 100m);
                         <div class="category-row" @onclick="() => OpenKeypad(row.CategoryId)">
-                            <div class="cat-icon" style="background:@row.ColorKey;">
+                            <div class="cat-icon" style="background:@ColorHelper.Lighten(row.ColorKey, 0.75);">
                                 <img src="images/categories/@(row.LogoImage).png" />
                             </div>
                             <div class="cat-info">
