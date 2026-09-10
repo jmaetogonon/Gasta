@@ -65,8 +65,8 @@
 }
 
     .picker-icon-wrap img {
-        width: 26px;
-        height: 26px;
+        max-width: 32px;
+        max-height: 26px;
     }
 
 .picker-check {

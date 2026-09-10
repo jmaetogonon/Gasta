@@ -4,7 +4,6 @@
     align-items: center;
     justify-content: center;
     padding: 18px 16px;
-    border-radius: 0 0 20px 20px;
     margin: -20px -20px 0;
 }
 
@@ -13,8 +12,8 @@
     height: 32px;
     border-radius: 50%;
     border: none;
-    background: rgba(255, 255, 255, 0.35);
-    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.55);
+    color: black;
     font-size: 13px;
     cursor: pointer;
     display: flex;
@@ -62,6 +61,7 @@
 .total-amount {
     font-size: 22px;
     font-weight: bold;
+    font-family: var(--font-display);
 }
 
 .transaction-list {

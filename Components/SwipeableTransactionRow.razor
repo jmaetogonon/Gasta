@@ -1,4 +1,5 @@
 @* Usage: <SwipeableTransactionRow Item="item" OnTap="OpenEdit" OnDelete="DeleteExpense" /> *@
+@using Gasta.Helpers
 @inject IJSRuntime JS
 
 <div class="transaction-row-wrap">
@@ -11,7 +12,7 @@
          @onpointerup="OnPointerUp"
          @onpointercancel="OnPointerCancel"
          @onclick="OnClick">
-        <div class="tx-icon" style="background:@Item.CategoryColorKey;">
+        <div class="tx-icon" style="background:@ColorHelper.Lighten(Item.CategoryColorKey, 0.75);">
             <img src="images/categories/@(Item.CategoryLogo).png" />
         </div>
         <div class="tx-info">

@@ -14,6 +14,7 @@
     border-radius: 16px;
     padding: 16px;
     margin-top: 8px;
+    color: var(--text-primary);
 }
 
 .amount-row {

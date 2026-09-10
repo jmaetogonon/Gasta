@@ -1,25 +1,33 @@
 @* Usage from Home.razor (placed at page root, after other content, so it renders on top):
    <AddExpenseSheet @bind-IsOpen="ShowAddExpense" Category="SelectedCategory" OnSaved="LoadAsync" />
 *@
-@using Gasta.Helpers
 @inject Gasta.Data.Repositories.IExpenseRepository ExpenseRepository
 @inject Gasta.Data.Repositories.IPaymentMethodRepository PaymentMethodRepository
-@inject Gasta.Services.ThemeService ThemeService
+@inject IJSRuntime JS
 
 <div class="sheet-scrim @(IsOpen ? "open" : "")" @onclick="Cancel"></div>
 <div class="sheet-panel @(IsOpen ? "open" : "")" @onclick:stopPropagation="true">
 
     @if (Category is not null)
     {
-        <div class="sheet-banner" style="background:@Category.ColorKey;">
+        <div class="sheet-banner">
             <span class="banner-title">ADD @Category.Name.ToUpper() EXPENSE</span>
             <button class="close-btn" @onclick="Cancel">&#10005;</button>
         </div>
 
         <div class="sheet-body">
             <label class="field-label">Date</label>
-            <input class="field-input" type="date" value="@Date.ToString("yyyy-MM-dd")"
-                   @onchange="OnDateChanged" />
+            <div class="field-input tappable" @onclick="OpenDatePicker">
+                <span>@Date.ToString("MMMM d, yyyy")</span>
+                <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                    <line x1="8" y1="3" x2="8" y2="7" />
+                    <line x1="16" y1="3" x2="16" y2="7" />
+                </svg>
+            </div>
+            <input type="date" @ref="_dateInputRef" class="hidden-date-input"
+                   value="@Date.ToString("yyyy-MM-dd")" @onchange="OnDateChanged" />
 
             <label class="field-label">Expense</label>
             <div class="field-input tappable" @onclick="() => ShowKeypad = true">
@@ -39,7 +47,6 @@
                 @foreach (var m in PaymentMethods)
                 {
                     <div class="pm-chip @(SelectedPaymentMethodId == m.Id ? "selected" : "")"
-                         style="@(SelectedPaymentMethodId == m.Id ? $"border-color:{m.ColorKey}; box-shadow: var(--shadow-chip), 0 0 0 4px {m.ColorKey}33;" : "")"
                          @onclick="() => SelectedPaymentMethodId = m.Id">
                         <img src="images/payments/@(m.LogoImage).svg" />
                         @if (SelectedPaymentMethodId == m.Id)
@@ -61,14 +68,8 @@
             <textarea class="field-input notes" @bind="Notes" placeholder="Add a note"></textarea>
 
             <div class="action-row">
-                <button class="cancel-button"
-                        style="background:@ColorHelper.AdaptiveTrack(Category.ColorKey, ThemeService.IsDark, lightAmount: 0.8, darkAmount: 0.6); color:@Category.ColorKey; border-color:@Category.ColorKey;"
-                        @onclick="Cancel">
-                    Cancel
-                </button>
-                <button class="save-button" style="background:@Category.ColorKey;" disabled="@(!CanSave)" @onclick="Save">
-                    Add Expense
-                </button>
+                <button class="cancel-button" @onclick="Cancel">Cancel</button>
+                <button class="save-button" disabled="@(!CanSave)" @onclick="Save">Add Expense</button>
             </div>
         </div>
     }
@@ -89,6 +90,7 @@
     private int? SelectedPaymentMethodId;
     private string Notes = "";
     private List<Gasta.Models.PaymentMethod> PaymentMethods = new();
+    private ElementReference _dateInputRef;
 
     private bool CanSave => Amount > 0 && SelectedPaymentMethodId.HasValue && Category is not null;
 
@@ -120,6 +122,11 @@
     {
         if (DateTime.TryParse(e.Value?.ToString(), out var d))
             Date = d;
+    }
+
+    private async Task OpenDatePicker()
+    {
+        await JS.InvokeVoidAsync("gastaDate.showPicker", _dateInputRef);
     }
 
     private async Task Save()

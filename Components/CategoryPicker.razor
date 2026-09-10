@@ -8,7 +8,7 @@
         @foreach (var c in Categories)
         {
             <div class="picker-item" @onclick="() => Select(c.Id)">
-                <div class="picker-icon-wrap" style="background:@c.ColorKey;">
+                <div class="picker-icon-wrap" style="background:@ColorHelper.Lighten(c.ColorKey, 0.75);">
                     <img src="images/categories/@(c.LogoImage).png" />
                     @if (SelectedCategoryId == c.Id)
                     {

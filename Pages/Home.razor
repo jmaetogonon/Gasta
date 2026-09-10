@@ -105,14 +105,14 @@ else
         <div class="category-grid">
             @foreach (var category in Categories)
             {
-                var circumference = 2 * Math.PI * 26;
+                var circumference = 2 * Math.PI * 24;
                 var offset = circumference * (1 - category.PercentSpent / 100);
                 var isOver = category.Spent > category.Budget;
                 <div class="category-item" @onclick="() => OpenAddExpense(category)">
                     <div class="ring-wrap">
                         <svg viewBox="0 0 64 64" class="ring">
-                            <circle class="ring-track" cx="32" cy="32" r="26" style="stroke:@(ColorHelper.AdaptiveTrack(category.ColorKey, ThemeService.IsDark, darkAmount: 0.45));" />
-                            <circle class="ring-fill" cx="32" cy="32" r="26"
+                            <circle class="ring-track" cx="32" cy="32" r="24" style="stroke:@(ColorHelper.AdaptiveTrack(category.ColorKey, ThemeService.IsDark, darkAmount: 0.45));" />
+                            <circle class="ring-fill" cx="32" cy="32" r="24"
                                     style="stroke:@(ColorHelper.AdaptiveTrack(category.ColorKey, ThemeService.IsDark, lightAmount: 0, darkAmount: -0.10)); stroke-dasharray:@circumference; stroke-dashoffset:@offset;" />
                         </svg>
                         <img src="images/categories/@(category.LogoImage).png" class="ring-logo" />

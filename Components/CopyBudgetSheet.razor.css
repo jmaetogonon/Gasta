@@ -69,14 +69,14 @@
 .intro-text {
     color: var(--text-secondary);
     font-size: 12px;
-    margin: 0 0 12px;
+    margin: 16px 0 12px;
     line-height: 1.4;
 }
 
 .month-switcher {
     display: flex;
     justify-content: center;
-     align-items: center;
+    align-items: center;
     border: 1px solid var(--border);
     border-radius: 18px;
     padding: 10px 14px;
