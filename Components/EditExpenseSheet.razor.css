@@ -82,12 +82,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
-    }
-
-    .field-input.category-field .inline-icon {
-        max-width: 26px;
-        max-height: 22px;
-    }
+    } 
 
     .field-input.notes {
         height: auto;
@@ -99,11 +94,13 @@
         font-family: inherit;
     }
 
+
 .hidden-date-input {
     position: absolute;
-    width: 0;
-    height: 0;
+    width: 1px;
+    height: 1px;
     opacity: 0;
+    overflow: hidden;
     pointer-events: none;
     border: none;
     padding: 0;
@@ -127,36 +124,48 @@
 }
 
 .chip-wrap {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
 }
 
 .pm-chip {
     position: relative;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 54px;
-    border-radius: 14px;
-    padding: 6px;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 999px;
     background: var(--LogoChipBackground, #ffffff);
     border: 2px solid var(--border);
     box-shadow: var(--shadow-soft);
     cursor: pointer;
+    white-space: nowrap;
 }
-
-    .pm-chip img {
-        max-width: 85%;
-        max-height: 26px;
-        object-fit: contain;
-    }
 
     .pm-chip.selected {
         border-color: var(--color-primary);
         border-width: 2.5px;
         box-shadow: var(--shadow-chip);
     }
+
+.check-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: white;
+    font-size: 0.625rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--surface);
+}
 
 .check-badge {
     position: absolute;

@@ -37,6 +37,7 @@
 </div>
 
 <EditExpenseSheet @bind-IsOpen="ShowEdit" ExpenseId="EditingExpenseId" OnSaved="LoadAsync" />
+<PaymentMethodEditSheet @bind-IsOpen="ShowEditPaymentMethod" PaymentMethodId="PaymentMethodId" OnSaved="LoadAsync" />
 
 @code {
     [SupplyParameterFromQuery(Name = "paymentMethodId")]
@@ -50,6 +51,7 @@
     private readonly DateTime Now = DateTime.Now;
 
     private bool ShowEdit;
+    private bool ShowEditPaymentMethod;
     private int EditingExpenseId;
 
     protected override async Task OnInitializedAsync() => await LoadAsync();
@@ -76,7 +78,8 @@
     private async Task OnEditPaymentMethod()
     {
         // Manage Payment Methods isn't built yet — same "Coming soon" pattern as Settings.
-        await Alert.ShowAsync("Editing payment methods is coming soon.", "Coming Soon");
+        // await Alert.ShowAsync("Editing payment methods is coming soon.", "Coming Soon"); 
+        ShowEditPaymentMethod = true;
     }
 
     private void GoBack() => Nav.NavigateTo("");

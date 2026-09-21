@@ -9,7 +9,7 @@
         {
             <div class="picker-item" @onclick="() => Select(c.Id)">
                 <div class="picker-icon-wrap" style="background:@ColorHelper.Lighten(c.ColorKey, 0.75);">
-                    <img src="images/categories/@(c.LogoImage).png" />
+                    <CategoryIcon IconKey="@c.IconKey" LogoImage="@c.LogoImage" Color="@c.ColorKey" Size="28" />
                     @if (SelectedCategoryId == c.Id)
                     {
                         <span class="picker-check">✓</span>

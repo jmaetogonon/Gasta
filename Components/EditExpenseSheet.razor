@@ -30,7 +30,7 @@
             @if (SelectedCategory is not null)
             {
                 <span class="field-left">
-                    <img src="images/categories/@(SelectedCategory.LogoImage).png" class="inline-icon" />
+                    <CategoryIcon IconKey="@SelectedCategory.IconKey" LogoImage="@SelectedCategory.LogoImage" Color="@SelectedCategory.ColorKey" Size="20"  />
                     <span>@SelectedCategory.Name</span>
                 </span>
             }
@@ -53,14 +53,14 @@
             }
             <span class="chevron">&#10095;</span>
         </div>
-
+         
         <label class="field-label">Payment Method</label>
         <div class="chip-wrap">
             @foreach (var m in PaymentMethods)
             {
                 <div class="pm-chip @(SelectedPaymentMethodId == m.Id ? "selected" : "")"
                      @onclick="() => SelectedPaymentMethodId = m.Id">
-                    <img src="images/payments/@(m.LogoImage).svg" />
+                    <PaymentMethodIcon LogoImage="@m.LogoImage" Name="@m.Name" ColorKey="@m.ColorKey" ShowLabelWithFallback="true" ShowBackground="false" Size="16" />
                     @if (SelectedPaymentMethodId == m.Id)
                     {
                         <span class="check-badge">&#10003;</span>
@@ -146,7 +146,16 @@
 
     private async Task OpenDatePicker()
     {
-        await JS.InvokeVoidAsync("gastaDate.showPicker", _dateInputRef);
+        if (JS is IJSInProcessRuntime sync)
+        {
+            sync.InvokeVoid("gastaDate.showPicker", _dateInputRef);
+        }
+        else
+        {
+            // Fallback for any host that isn't in-process JS (shouldn't happen in
+            // Blazor WASM, but keeps this safe if that ever changes).
+            await JS.InvokeVoidAsync("gastaDate.showPicker", _dateInputRef);
+        }
     }
 
     private async Task Save()

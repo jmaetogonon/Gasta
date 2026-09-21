@@ -1,0 +1,74 @@
+﻿@* Usage (list row, own badge): <PaymentMethodIcon LogoImage="m.LogoImage" Name="m.Name" ColorKey="m.ColorKey" Size="40" />
+   Usage (bare, inside an already-colored chip): <PaymentMethodIcon ... ShowBackground="false" Size="24" />
+   NOTE: logos are wide rectangular wordmarks (GCash, MariBank, ShopeePay), not square
+   icons like categories. Size drives HEIGHT only for the image cases — width is auto
+   with a cap — otherwise object-fit:contain inside a forced square box shrinks a wide
+   logo down to a sliver to make it fit (this was a real bug, not a style choice). *@
+@using Gasta.Helpers
+
+@if (ShowBackground)
+{
+    <div class="pm-icon-circle" style="width:@(Size)px;height:@(Size)px;background:@(ColorKey ?? "var(--surface-alt)");@Style"
+         @attributes="AdditionalAttributes">
+        @if (HasLogo)
+        {
+            <img src="images/payments/@(LogoImage).png" style="height:@(Size * 0.5)px;width:auto;max-width:@(Size * 0.8)px;object-fit:contain;" />
+        }
+        else
+        {
+            <span style="color:white;font-weight:bold;font-size:@(Size * 0.4)px;line-height:1;">@InitialLetter</span>
+        }
+    </div>
+}
+else if (HasLogo)
+{
+    <img src="images/payments/@(LogoImage).png" style="height:@(Size)px;width:auto;max-width:@(Size * 3.5)px;object-fit:contain;@Style" @attributes="AdditionalAttributes" />
+}
+else if (ShowLabelWithFallback)
+{
+    @* Wordmark logos already self-label; the plain initial badge carries no brand
+       info on its own (a bare "U" means nothing), so this case pairs the badge with
+       the method's name — used on Home where nothing else on the chip identifies it. *@
+    <div style="display:flex;align-items:center;gap:8px;@Style" @attributes="AdditionalAttributes">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:@(Size)px;height:@(Size)px;border-radius:50%;background:@(ColorHelper.Darken(ColorKey ?? "#888888", 0.28));color:white;font-weight:bold;font-size:@(Size * 0.5)px;line-height:1;flex-shrink:0;">@InitialLetter</span>
+        <strong style="color:@(LabelColor ?? "inherit");font-size:0.75rem;">@Name</strong>
+    </div>
+}
+else
+{
+    <span style="display:inline-flex;align-items:center;justify-content:center;width:@(Size)px;height:@(Size)px;border-radius:50%;background:@(ColorHelper.Darken(ColorKey ?? "#888888", 0.28));color:white;font-weight:bold;font-size:@(Size * 0.5)px;line-height:1;flex-shrink:0;@Style"
+          @attributes="AdditionalAttributes">@InitialLetter</span>
+}
+
+@code {
+    [Parameter] public string? LogoImage { get; set; }
+    [Parameter] public string? Name { get; set; }
+    [Parameter] public string? ColorKey { get; set; }
+    [Parameter] public int Size { get; set; } = 40;
+    [Parameter] public string? Style { get; set; }
+
+    // true = draws its own circular badge (Manage Payment Methods list rows, the
+    // edit-sheet logo picker). false = renders bare — for Home's chips/rows, which
+    // are already colored by the caller and would double up on background otherwise.
+    [Parameter] public bool ShowBackground { get; set; } = true;
+
+    // Only applies when ShowBackground=false AND there's no bundled logo. Pairs the
+    // initial badge with the method's name as text, since (unlike a wordmark logo)
+    // a bare letter doesn't identify the method by itself. Off by default so
+    // Manage Payment Methods (which already shows the name separately) doesn't
+    // double it up.
+    [Parameter] public bool ShowLabelWithFallback { get; set; } = false;
+
+    // Text color for the paired name label — pass the same value you use for the
+    // amount text on that chip (e.g. Home's AmountTextColor(payment)) so the name
+    // stays legible against whatever the chip's background color is.
+    [Parameter] public string? LabelColor { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool HasLogo => !string.IsNullOrEmpty(LogoImage) && PaymentLogoSet.Logos.Contains(LogoImage);
+
+    private string InitialLetter =>
+        string.IsNullOrWhiteSpace(Name) ? "?" : Name.Trim()[0].ToString().ToUpperInvariant();
+}

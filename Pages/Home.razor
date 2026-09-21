@@ -78,7 +78,8 @@
             @foreach (var payment in Payments)
             {
                 <div class="chip" style="background:@PaymentChipBackground(payment);" @onclick="() => GoToExpenseList(payment.Id)">
-                    <img src="images/payments/@(payment.LogoImage).svg" />
+                    <PaymentMethodIcon LogoImage="@payment.LogoImage" Name="@payment.Name" ColorKey="@payment.ColorKey"
+                                       ShowBackground="false" ShowLabelWithFallback="true" LabelColor="@(AmountTextColor(payment))" Size="24" />
                     <strong style="color:@(AmountTextColor(payment));">@payment.Spent.ToString("₱#,##0.00")</strong>
                 </div>
             }
@@ -91,7 +92,8 @@
             {
                 <div class="payment-row" style="background:@PaymentChipBackground(payment);" @onclick="() => GoToExpenseList(payment.Id)">
                     <div class="payment-row-logo">
-                        <img src="images/payments/@(payment.LogoImage).svg" />
+                        <PaymentMethodIcon LogoImage="@payment.LogoImage" Name="@payment.Name" ColorKey="@payment.ColorKey"
+                                           ShowBackground="false" ShowLabelWithFallback="true" LabelColor="@(AmountTextColor(payment))" Size="24" />
                     </div>
                     <strong class="payment-row-amount" style="color:@(AmountTextColor(payment))">@payment.Spent.ToString("₱#,##0.00")</strong>
                 </div>
