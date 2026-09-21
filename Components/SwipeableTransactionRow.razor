@@ -13,7 +13,8 @@
          @onpointercancel="OnPointerCancel"
          @onclick="OnClick">
         <div class="tx-icon" style="background:@ColorHelper.Lighten(Item.CategoryColorKey, 0.75);">
-            <img src="images/categories/@(Item.CategoryLogo).png" />
+            @* <img src="images/categories/@(Item.CategoryLogo).png" /> *@
+            <CategoryIcon IconKey="@Item.CategoryIconKey" LogoImage="@Item.CategoryLogo" Color="@Item.CategoryColorKey" Size="20" />
         </div>
         <div class="tx-info">
             <span class="tx-category">@Item.CategoryName</span>

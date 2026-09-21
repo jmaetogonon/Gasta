@@ -3,6 +3,7 @@
 @inject Gasta.Data.IndexedDbService IndexedDbService
 @inject Gasta.Services.SeedService SeedService
 @inject Gasta.Services.AlertService Alert
+@inject NavigationManager Nav
 
 <PageTitle>Gasta - Settings</PageTitle>
 
@@ -29,7 +30,7 @@
             <span>Manage Payment Methods</span>
             <span class="chevron">&#10095;</span>
         </div>
-        <div class="list-row" @onclick='() => ShowComingSoon("Manage Categories")'>
+        <div class="list-row" @onclick='() => Nav.NavigateTo("managecategories")'>
             <span>Manage Categories</span>
             <span class="chevron">&#10095;</span>
         </div>

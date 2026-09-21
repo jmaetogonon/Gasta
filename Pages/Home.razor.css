@@ -296,13 +296,11 @@
     height: 96px;
 }
 
-.ring-logo {
+::deep .ring-logo {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-width: 50px;
-    max-height: 34px;
 }
 
 /* scaleX(-1) mirrors the ring horizontally around its own center, which passes

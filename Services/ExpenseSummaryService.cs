@@ -2,7 +2,7 @@ using Gasta.Data.Repositories;
 
 namespace Gasta.Services;
 
-public record SpendSummary(int Id, string Name, string ColorKey, string LogoImage, decimal Spent, decimal Budget)
+public record SpendSummary(int Id, string Name, string ColorKey, string LogoImage, decimal Spent, decimal Budget, string? IconKey = null)
 {
     public double PercentSpent => Budget <= 0 ? 0 : Math.Clamp((double)(Spent / Budget * 100m), 0, 100);
 }
@@ -20,7 +20,8 @@ public record ExpenseListItem(
     string CategoryName,
     string CategoryLogo,
     string CategoryColorKey,
-    string? Notes);
+    string? Notes,
+    string? CategoryIconKey = null);
 
 public record DailySpendPoint(DateTime Date, decimal Amount);
 
@@ -32,7 +33,7 @@ public record MonthComparison(decimal Current, decimal Previous)
         : (double)Math.Abs((Current - Previous) / Previous * 100m);
 }
 
-public record CategoryBudgetRow(int CategoryId, string Name, string ColorKey, string LogoImage, decimal Amount);
+public record CategoryBudgetRow(int CategoryId, string Name, string ColorKey, string LogoImage, decimal Amount, string? IconKey = null);
 
 public class ExpenseSummaryService
 {
@@ -79,7 +80,7 @@ public class ExpenseSummaryService
                 return new SpendSummary(
                     c.Id, c.Name, c.ColorKey, c.LogoImage,
                     expenses.Where(e => e.CategoryId == c.Id).Sum(e => e.Amount),
-                    budget);
+                    budget, c.IconKey);
             })
             .ToList();
     }
@@ -121,7 +122,8 @@ public class ExpenseSummaryService
                     category?.Name ?? "Uncategorized",
                     category?.LogoImage ?? "",
                     category?.ColorKey ?? "#9AA0A6",
-                    e.Notes);
+                    e.Notes,
+                    category?.IconKey);
             })
             .ToList();
     }
@@ -143,7 +145,7 @@ public class ExpenseSummaryService
             .Select(c =>
             {
                 var amount = budgets.FirstOrDefault(b => b.CategoryId == c.Id)?.Amount ?? 0;
-                return new CategoryBudgetRow(c.Id, c.Name, c.ColorKey, c.LogoImage, amount);
+                return new CategoryBudgetRow(c.Id, c.Name, c.ColorKey, c.LogoImage, amount, c.IconKey);
             })
             .ToList();
     }
@@ -212,7 +214,7 @@ public class ExpenseSummaryService
                     category?.Name ?? "Uncategorized",
                     category?.LogoImage ?? "",
                     category?.ColorKey ?? "#9AA0A6",
-                    e.Notes);
+                    e.Notes, category?.IconKey);
             })
             .ToList();
     }
@@ -242,7 +244,7 @@ public class ExpenseSummaryService
                     category?.Name ?? "Uncategorized",
                     category?.LogoImage ?? "",
                     category?.ColorKey ?? "#9AA0A6",
-                    e.Notes);
+                    e.Notes, category?.IconKey);
             })
             .ToList();
     }

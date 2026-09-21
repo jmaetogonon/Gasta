@@ -1,5 +1,6 @@
 @page "/"
 @using Gasta.Helpers
+@using Gasta.Components
 @inject Services.ExpenseSummaryService SummaryService
 @inject Services.ThemeService ThemeService
 @inject NavigationManager Nav
@@ -115,7 +116,7 @@ else
                             <circle class="ring-fill" cx="32" cy="32" r="24"
                                     style="stroke:@(ColorHelper.AdaptiveTrack(category.ColorKey, ThemeService.IsDark, lightAmount: 0, darkAmount: -0.10)); stroke-dasharray:@circumference; stroke-dashoffset:@offset;" />
                         </svg>
-                        <img src="images/categories/@(category.LogoImage).png" class="ring-logo" />
+                        <CategoryIcon IconKey="@category.IconKey" LogoImage="@category.LogoImage" Color="@category.ColorKey" Size="28" class="ring-logo" />
                     </div>
                     <span style="color:@(category.ColorKey);font-size:0.688rem;font-weight: 600;font-family: var(--font-display);">@category.Name</span>
                     <span class="caption @(isOver ? "over-budget" : "")">@category.Spent.ToString("₱#,##0") / @category.Budget.ToString("₱#,##0")</span>
@@ -137,7 +138,7 @@ else
 
                     <div class="category-list-row" @onclick="() => OpenAddExpense(category)">
                         <div class="cat-list-icon" style="background:@ColorHelper.Lighten(category.ColorKey, 0.75);">
-                            <img src="images/categories/@(category.LogoImage).png" />
+                            <CategoryIcon IconKey="@category.IconKey" LogoImage="@category.LogoImage" Color="@category.ColorKey" Size="20" />
                         </div>
                         <div class="cat-list-info">
                             <div class="cat-list-top">
