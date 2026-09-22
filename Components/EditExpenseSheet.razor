@@ -6,6 +6,8 @@
 
 <div class="sheet-scrim @(IsOpen ? "open" : "")" @onclick="Cancel"></div>
 <div class="sheet-panel @(IsOpen ? "open" : "")" @onclick:stopPropagation="true">
+    <div class="sheet-notch"></div>
+
     @if (_loaded)
     {
         <div class="sheet-header">
@@ -55,18 +57,14 @@
             }
             <span class="chevron">&#10095;</span>
         </div>
-         
-        <label class="field-label">Payment Method</label>
+
+         <label class="field-label">Payment Method</label>
         <div class="chip-wrap">
             @foreach (var m in PaymentMethods)
             {
-                <div class="pm-chip @(SelectedPaymentMethodId == m.Id ? "selected" : "")"
-                     @onclick="() => SelectedPaymentMethodId = m.Id">
-                    <PaymentMethodIcon LogoImage="@m.LogoImage" Name="@m.Name" ColorKey="@m.ColorKey" ShowLabelWithFallback="true" ShowBackground="false" Size="16" />
-                    @if (SelectedPaymentMethodId == m.Id)
-                    {
-                        <span class="check-badge">&#10003;</span>
-                    }
+                <div class="pm-chip @(SelectedPaymentMethodId == m.Id ? "selected" : "")" @onclick="() => SelectedPaymentMethodId = m.Id">
+                    <PaymentMethodIcon LogoImage="@m.LogoImage" Name="@m.Name" PreferIcon="true" ColorKey="@m.ColorKey" Size="18" />
+                    <span>@m.Name</span>
                 </div>
             }
         </div>
@@ -84,7 +82,7 @@
 <NumericKeypad @bind-IsOpen="ShowKeypad" InitialValue="Amount" OnConfirmed="v => Amount = v" />
 
 <CategoryPicker @bind-IsOpen="ShowCategoryPicker" Categories="Categories"
-                SelectedCategoryId="SelectedCategoryId" OnSelected="id => SelectedCategoryId = id" />
+                SelectedCategoryId="SelectedCategoryId" OnSelected="id => SelectedCategoryId = id" OnCategoryAdded="OnCategoryAdded" />
 
 @code {
     [Parameter] public bool IsOpen { get; set; }
@@ -145,6 +143,8 @@
         if (DateTime.TryParse(e.Value?.ToString(), out var d))
             Date = d;
     } 
+
+    private void OnCategoryAdded(Gasta.Models.Category cat) => Categories.Add(cat);
 
     private async Task Save()
     {

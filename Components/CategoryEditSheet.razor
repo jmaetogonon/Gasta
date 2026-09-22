@@ -61,7 +61,7 @@
     [Parameter] public bool IsOpen { get; set; }
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
     [Parameter] public int? CategoryId { get; set; }
-    [Parameter] public EventCallback OnSaved { get; set; }
+    [Parameter] public EventCallback<int> OnSaved { get; set; }
 
     private bool _wasOpen;
     private string Name = "";
@@ -126,8 +126,8 @@
         category.ColorKey = SelectedColorKey!;
         category.IconKey = SelectedIconKey;
 
-        await CategoryRepository.SaveAsync(category);
-        await OnSaved.InvokeAsync();
+        var savedId = await CategoryRepository.SaveAsync(category);
+        await OnSaved.InvokeAsync(savedId);
         await Close();
     }
 

@@ -73,9 +73,30 @@
     white-space: nowrap;
 }
 
+.tx-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .tx-date {
     font-size: 10px;
     color: var(--text-secondary);
+}
+
+.tx-pm {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+
+.tx-pm-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .tx-amount {

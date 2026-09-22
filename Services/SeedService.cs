@@ -55,8 +55,8 @@ public class SeedService
             new() { Name = "Maya", LogoImage = "maya", ColorKey = "#1F1B18", SortOrder = 3 },
             new() { Name = "Debit Card", LogoImage = "debitcard", ColorKey = "#ffe0c3", SortOrder = 4 },
             new() { Name = "MariBank", LogoImage = "maribank", ColorKey = "#f8e9df", SortOrder = 5 },
-            new() { Name = "GOtyme bank", LogoImage = "gotyme", ColorKey = "#a3eef3", SortOrder = 6 },
-            new() { Name = "Shoppee Pay", LogoImage = "shopeepay", ColorKey = "#ffd3cc", SortOrder = 7 },
+            new() { Name = "GOtyme", LogoImage = "gotyme", ColorKey = "#a3eef3", SortOrder = 6 },
+            new() { Name = "ShoppeePay", LogoImage = "shopeepay", ColorKey = "#ffd3cc", SortOrder = 7 },
         };
         foreach (var m in paymentMethods)
             await _paymentMethodRepository.SaveAsync(m);

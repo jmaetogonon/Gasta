@@ -1,3 +1,16 @@
+/* Sticky, not a separate scroll container — rides on the page's normal scroll, so
+   the tab content below scrolls the page as usual while this block stays pinned to
+   the top once you scroll past it. Needs an opaque background since scrolled
+   content (category rings, payment rows) will pass directly underneath it. */
+.home-fixed {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+    margin: -20px -20px 0;
+    padding: 20px 20px 4px;
+}
+
 .header {
     display: flex;
     align-items: center;
@@ -116,6 +129,7 @@
     margin-top: 8px;
     font-size: 0.625rem;
     color: var(--text-secondary);
+    font-family: var(--font-display);
 }
 
 .overview-divider {

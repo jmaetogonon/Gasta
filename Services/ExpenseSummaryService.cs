@@ -21,7 +21,12 @@ public record ExpenseListItem(
     string CategoryLogo,
     string CategoryColorKey,
     string? Notes,
-    string? CategoryIconKey = null);
+    string? CategoryIconKey = null,
+    string? PaymentMethodName = null,
+    string? PaymentMethodLogo = null,
+    string? PaymentMethodColorKey = null,
+    int? CategoryId = null,
+    int? PaymentMethodId = null);
 
 public record DailySpendPoint(DateTime Date, decimal Amount);
 
@@ -116,14 +121,14 @@ public class ExpenseSummaryService
             {
                 var category = categories.FirstOrDefault(c => c.Id == e.CategoryId);
                 return new ExpenseListItem(
-                    e.Id,
-                    e.Date,
-                    e.Amount,
+                    e.Id, e.Date, e.Amount,
                     category?.Name ?? "Uncategorized",
                     category?.LogoImage ?? "",
                     category?.ColorKey ?? "#9AA0A6",
                     e.Notes,
-                    category?.IconKey);
+                    category?.IconKey,
+                    CategoryId: e.CategoryId,
+                    PaymentMethodId: e.PaymentMethodId);
             })
             .ToList();
     }
@@ -208,22 +213,22 @@ public class ExpenseSummaryService
             {
                 var category = categories.FirstOrDefault(c => c.Id == e.CategoryId);
                 return new ExpenseListItem(
-                    e.Id,
-                    e.Date,
-                    e.Amount,
+                    e.Id, e.Date, e.Amount,
                     category?.Name ?? "Uncategorized",
                     category?.LogoImage ?? "",
                     category?.ColorKey ?? "#9AA0A6",
-                    e.Notes, category?.IconKey);
+                    e.Notes, category?.IconKey,
+                    CategoryId: e.CategoryId,
+                    PaymentMethodId: e.PaymentMethodId);
             })
             .ToList();
     }
 
     /// <summary>
     /// All transactions across every payment method for a given month, most recent first.
-    /// Used by the full All Transactions page (with its own month switcher), as opposed to
-    /// GetRecentTransactionsAsync (count-limited, ignores month) or
-    /// GetTransactionsForPaymentMethodAsync (single payment method).
+    /// Now includes PaymentMethod display fields AND both entity Ids, since this is the
+    /// only page (All Transactions) that shows payment method per row and needs to
+    /// filter by it.
     /// </summary>
     public async Task<List<ExpenseListItem>> GetAllTransactionsForMonthAsync(int year, int month)
     {
@@ -232,19 +237,25 @@ public class ExpenseSummaryService
             .ToList();
 
         var categories = await _categoryRepository.GetActiveOrderedAsync();
+        var paymentMethods = await _paymentMethodRepository.GetActiveOrderedAsync();
 
         return expenses
             .Select(e =>
             {
                 var category = categories.FirstOrDefault(c => c.Id == e.CategoryId);
+                var method = paymentMethods.FirstOrDefault(m => m.Id == e.PaymentMethodId);
                 return new ExpenseListItem(
-                    e.Id,
-                    e.Date,
-                    e.Amount,
+                    e.Id, e.Date, e.Amount,
                     category?.Name ?? "Uncategorized",
                     category?.LogoImage ?? "",
                     category?.ColorKey ?? "#9AA0A6",
-                    e.Notes, category?.IconKey);
+                    e.Notes,
+                    category?.IconKey,
+                    method?.Name,
+                    method?.LogoImage,
+                    method?.ColorKey,
+                    CategoryId: e.CategoryId,
+                    PaymentMethodId: e.PaymentMethodId);
             })
             .ToList();
     }

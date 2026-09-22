@@ -50,7 +50,7 @@
     display: block;
     font-size: 0.688rem;
     color: var(--text-secondary);
-    margin: 14px 0 6px;
+    margin: 14px 0 4px;
 }
 
     .field-label:first-of-type {
@@ -82,7 +82,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
-    } 
+    }
 
     .field-input.notes {
         height: auto;
@@ -92,6 +92,7 @@
         padding-top: 12px;
         padding-bottom: 12px;
         font-family: inherit;
+        color: var(--text-primary);
     }
 
 
@@ -154,24 +155,24 @@
 }
 
 .pm-chip {
-    position: relative;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    height: 40px;
-    padding: 0 14px;
+    gap: 6px;
+    padding: 8px 14px;
     border-radius: 999px;
-    background: var(--LogoChipBackground, #ffffff);
+    background: var(--surface-alt);
     border: 2px solid var(--border);
-    box-shadow: var(--shadow-soft);
+    font-size: 0.625rem;
+    font-weight: 500;
+    font-family: var(--font-display);
     cursor: pointer;
     white-space: nowrap;
 }
 
     .pm-chip.selected {
         border-color: var(--color-primary);
-        border-width: 2.5px;
-        box-shadow: var(--shadow-chip);
+        color: var(--color-primary);
+        background: color-mix(in srgb, var(--color-primary) 12%, var(--surface-alt));
     }
 
 .check-badge {

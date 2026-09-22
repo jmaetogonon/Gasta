@@ -12,7 +12,7 @@
         @foreach (var method in Methods)
         {
             <div class="category-row" @onclick="@(() => OpenEdit(method.Id))">
-                <PaymentMethodIcon LogoImage="@method.LogoImage" Name="@method.Name" ColorKey="@method.ColorKey" Size="40" />
+                <PaymentMethodIcon LogoImage="@method.LogoImage" Name="@method.Name" PreferIcon="true"  ColorKey="@method.ColorKey" Size="40" />
                 <span class="cat-name">@method.Name</span>
                 <span class="chevron">&#10095;</span>
             </div>

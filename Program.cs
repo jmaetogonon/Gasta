@@ -20,6 +20,7 @@ builder.Services.AddScoped<ICategoryBudgetRepository, CategoryBudgetRepository>(
 builder.Services.AddScoped<ExpenseSummaryService>();
 builder.Services.AddScoped<SeedService>();
 builder.Services.AddScoped<ThemeService>();
+builder.Services.AddScoped<AddExpenseUiService>();
 builder.Services.AddSingleton<AlertService>();
 
 var host = builder.Build();

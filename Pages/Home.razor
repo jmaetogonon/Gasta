@@ -1,10 +1,13 @@
 @page "/"
 @using Gasta.Helpers
 @using Gasta.Components
+@implements IDisposable
+@inject Gasta.Services.AddExpenseUiService AddExpenseUi
 @inject Services.ExpenseSummaryService SummaryService
 @inject Services.ThemeService ThemeService
 @inject NavigationManager Nav
 
+<div class="home-fixed">
 <div class="header">
     <div class="avatar">H</div>
     <div class="month-switcher">
@@ -68,6 +71,7 @@
             }
         </span>
     </div>
+    </div>
 </div>
 
 @if (IsPaymentsTab)
@@ -114,9 +118,9 @@ else
                 <div class="category-item" @onclick="() => OpenAddExpense(category)">
                     <div class="ring-wrap">
                         <svg viewBox="0 0 64 64" class="ring">
-                            <circle class="ring-track" cx="32" cy="32" r="24" style="stroke:@(ColorHelper.AdaptiveTrack(category.ColorKey, ThemeService.IsDark, darkAmount: 0.45));" />
+                            <circle class="ring-track" cx="32" cy="32" r="24" style="stroke:@(ColorHelper.AdaptiveTrackToward(category.ColorKey, ThemeService.IsDark, ColorHelper.DarkPageBackground, darkAmount: 0.6));" />
                             <circle class="ring-fill" cx="32" cy="32" r="24"
-                                    style="stroke:@(ColorHelper.AdaptiveTrack(category.ColorKey, ThemeService.IsDark, lightAmount: 0, darkAmount: -0.10)); stroke-dasharray:@circumference; stroke-dashoffset:@offset;" />
+                                    style="stroke:@(ColorHelper.AdaptiveTrack(category.ColorKey, ThemeService.IsDark, lightAmount: 0, darkAmount: -0.2)); stroke-dasharray:@circumference; stroke-dashoffset:@offset;" />
                         </svg>
                         <CategoryIcon IconKey="@category.IconKey" LogoImage="@category.LogoImage" Color="@category.ColorKey" Size="28" class="ring-logo" />
                     </div>
@@ -162,8 +166,6 @@ else
     }
 }
 
-<AddExpenseSheet @bind-IsOpen="ShowAddExpense" Category="SelectedCategory" OnSaved="LoadAsync" />
-
 @code {
     private DateTime SelectedMonth = DateTime.Now;
     private decimal Budget, Total, Remaining;
@@ -174,9 +176,6 @@ else
     private List<Services.SpendSummary> Payments = new();
     private List<Services.SpendSummary> Categories = new();
 
-    private bool ShowAddExpense;
-    private Services.SpendSummary? SelectedCategory;
-
     private bool CurrentGridView => IsPaymentsTab ? PaymentsGridView : CategoriesGridView;
 
     private void ToggleCurrentView()
@@ -185,7 +184,13 @@ else
         else CategoriesGridView = !CategoriesGridView;
     }
 
-    protected override async Task OnInitializedAsync() => await LoadAsync();
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+        AddExpenseUi.OnExpenseSaved += HandleExpenseSaved;
+    }
+
+    private async void HandleExpenseSaved() => await InvokeAsync(LoadAsync);
 
     private async Task LoadAsync()
     {
@@ -197,16 +202,16 @@ else
 
         Payments = await SummaryService.GetPaymentMethodSummariesAsync(SelectedMonth.Year, SelectedMonth.Month);
         Categories = await SummaryService.GetCategorySummariesAsync(SelectedMonth.Year, SelectedMonth.Month);
+        StateHasChanged();
     }
 
     private async Task PreviousMonth() { SelectedMonth = SelectedMonth.AddMonths(-1); await LoadAsync(); }
     private async Task NextMonth() { SelectedMonth = SelectedMonth.AddMonths(1); await LoadAsync(); }
 
-    private void OpenAddExpense(Services.SpendSummary category)
-    {
-        SelectedCategory = category;
-        ShowAddExpense = true;
-    }
+    private void OpenAddExpense(Services.SpendSummary category) => AddExpenseUi.Open(category);
+
+    public void Dispose() => AddExpenseUi.OnExpenseSaved -= HandleExpenseSaved;
+
 
     private void GoToExpenseList(int paymentMethodId) =>
         Nav.NavigateTo($"expenselist?paymentMethodId={paymentMethodId}");
@@ -215,8 +220,8 @@ else
     // theme-driven, so amount text needs a fixed color that reads on each one. Every
     // payment method's ColorKey is a light pastel except Maya (#1F1B18, near-black),
     // so black works everywhere except that one case.
-    private static string AmountTextColor(Services.SpendSummary payment) =>
-        payment.Name == "Maya" ? "white" : "black";
+    private string AmountTextColor(Services.SpendSummary payment) =>
+    ColorHelper.ReadableTextColor(PaymentChipBackground(payment));
 
     // Every payment ColorKey is a near-white pastel (except Maya). Shown at full
     // brightness on a dark page they read as glaring bright rectangles rather than
@@ -224,5 +229,5 @@ else
     // hue identity while toning it down — same technique as ColorHelper.AdaptiveTrack
     // for the category rings.
     private string PaymentChipBackground(Services.SpendSummary payment) =>
-        ThemeService.IsDark ? ColorHelper.Darken(payment.ColorKey, 0.22) : payment.ColorKey;
+        ThemeService.IsDark ? ColorHelper.Darken(payment.ColorKey, 0.10) : payment.ColorKey;
 }

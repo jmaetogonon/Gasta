@@ -43,6 +43,30 @@
     background: var(--color-primary);
 }
 
+.sheet-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 18px 0;
+}
+
+.sheet-title {
+    font-weight: bold;
+    font-size: 1rem;
+    font-family: var(--font-display);
+}
+
+.category-field {
+    justify-content: space-between;
+}
+
+.field-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .banner-title {
     color: white;
     font-weight: bold;
@@ -75,7 +99,7 @@
     display: block;
     font-size: 0.688rem;
     color: var(--text-secondary);
-    margin: 14px 0 6px;
+    margin: 14px 0 4px;
 }
 
     .field-label:first-child {
@@ -109,6 +133,7 @@
         padding-top: 12px;
         padding-bottom: 12px;
         font-family: inherit;
+        color: var(--text-primary);
     }
 
 .date-field-wrap {
@@ -190,49 +215,32 @@
         color: var(--danger);
     }
 
-.chip-wrap {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+.chip-wrap { 
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px; 
 }
 
 .pm-chip {
-    position: relative;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    height: 40px;
-    padding: 0 14px;
+    gap: 6px;
+    padding: 8px 14px;
     border-radius: 999px;
-    background: var(--LogoChipBackground, #ffffff);
+    background: var(--surface-alt);
     border: 2px solid var(--border);
-    box-shadow: var(--shadow-soft);
+    font-size: 0.625rem;
+    font-weight: 500;
+    font-family: var(--font-display);
     cursor: pointer;
     white-space: nowrap;
 }
 
-.pm-chip.selected {
-    border-color: var(--color-primary);
-    border-width: 2.5px;
-    box-shadow: var(--shadow-chip);
-}
-
-.check-badge {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    color: white;
-    font-size: 0.625rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--surface);
-}
+    .pm-chip.selected {
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+        background: color-mix(in srgb, var(--color-primary) 12%, var(--surface-alt));
+    }
 
 .action-row {
     display: flex;

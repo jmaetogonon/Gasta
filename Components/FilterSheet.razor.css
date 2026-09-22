@@ -1,4 +1,4 @@
-.sheet-scrim {
+﻿.sheet-scrim {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.45);
@@ -18,7 +18,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    max-height: 85vh;
+    max-height: 80vh;
     display: flex;
     flex-direction: column;
     background: var(--surface);
@@ -69,120 +69,64 @@
     display: block;
     font-size: 11px;
     color: var(--text-secondary);
-    margin: 14px 0 6px;
+    margin: 14px 0 8px;
 }
 
     .field-label:first-child {
         margin-top: 0;
     }
 
-.field-input {
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 0 14px;
-    height: 48px;
+.filter-chip-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
     background: var(--surface-alt);
-    font-size: 14px;
-    color: var(--text-primary);
-}
-
-.color-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-}
-
-.color-swatch {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 50%;
+    border: 2px solid var(--border);
+    font-size: 0.75rem;
+    font-weight: 400;
+    font-family: var(--font-display);
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    white-space: nowrap;
 }
 
-    .color-swatch.selected {
-        box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text-primary);
-    }
-
-.check {
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.icon-hint {
-    font-size: 11px;
-    color: var(--text-secondary);
-    margin: 0 0 8px;
-    line-height: 1.4;
-}
-
-.icon-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 8px;
-}
-
-.icon-swatch {
-    aspect-ratio: 1 / 1;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border: 2px solid transparent;
-}
-
-    .icon-swatch.selected {
+    .filter-chip.selected {
         border-color: var(--color-primary);
+        color: var(--color-primary);
+        background: color-mix(in srgb, var(--color-primary) 12%, var(--surface-alt));
     }
-
-.delete-link {
-    display: block;
-    width: 100%;
-    text-align: center;
-    background: none;
-    border: none;
-    color: var(--danger);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 14px 0 0;
-    cursor: pointer;
-}
 
 .action-row {
     display: flex;
     gap: 10px;
-    margin-top: 18px;
+    margin-top: 22px;
 }
 
 .save-button, .cancel-button {
     flex: 1;
     padding: 14px;
-    border: none;
     border-radius: 14px;
     font-weight: 500;
-    font-size: 15px;
+    font-size: 0.875rem;
     cursor: pointer;
     font-family: var(--font-display);
 }
 
 .save-button {
+    border: none;
     background: var(--color-primary);
     color: white;
 }
 
-    .save-button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
 .cancel-button {
-    background: var(--surface-alt);
-    color: var(--text-secondary);
+    border: 1.5px solid var(--color-primary);
+    background: transparent;
+    color: var(--color-primary);
 }
