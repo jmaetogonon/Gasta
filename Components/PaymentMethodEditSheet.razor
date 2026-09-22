@@ -37,9 +37,9 @@
             </div>
             @foreach (var logo in PaymentLogoSet.Logos)
             {
-                <div class="icon-swatch @(SelectedLogoImage == logo ? "selected" : "")"
+                <div class="icon-swatch icon-swatch-logo @(SelectedLogoImage == logo ? "selected" : "")"
                      @onclick="() => SelectedLogoImage = logo">
-                    <PaymentMethodIcon LogoImage="@logo" Size="32" />
+                    <img src="images/payments/@(logo).png" class="icon-swatch-logo-img" />
                 </div>
             }
         </div>

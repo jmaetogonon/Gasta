@@ -11,6 +11,6 @@ public static class PaymentLogoSet
 {
     public static readonly string[] Logos =
     [
-        "gcash", "creditcard", "cash", "maya", "debitcard", "maribank", "gotyme", "shopeepay", "bdo"
+        "gcash", "creditcard", "cash", "maya", "debitcard", "maribank", "gotyme", "shopeepay"
     ];
 }

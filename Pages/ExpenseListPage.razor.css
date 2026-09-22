@@ -27,12 +27,6 @@
     left: 16px;
 }
 
-.header-logo {
-    height: 26px;
-    max-width: 60%;
-    object-fit: contain;
-}
-
 .header-actions {
     position: absolute;
     right: 16px;

@@ -111,27 +111,42 @@
         font-family: inherit;
     }
 
-/*.hidden-date-input {
-    position: absolute;
-    width: 0;
-    height: 0;
-    opacity: 0;
-    pointer-events: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-}*/
-.hidden-date-input {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    opacity: 0;
-    overflow: hidden;
-    pointer-events: none;
-    border: none;
-    padding: 0;
-    margin: 0;
+.date-field-wrap {
+    position: relative;
 }
+
+.overlay-date-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    border: none;
+    padding: 0;
+    margin: 0;
+    /* Real, tappable, full-size — this IS the interaction now, not a JS-triggered
+       proxy. That's what avoids iOS's user-activation-through-interop problem
+       entirely, rather than working around a symptom of it. */
+}
+
+    /* By default, only the browser's own calendar-icon glyph inside the input is
+       the actual click target for opening the picker — the rest of the box is
+       hit-testable but inert. Stretching the picker-indicator pseudo-element to
+       fill the whole input makes the entire box the click target, matching the
+       visible .field-input's full size. WebKit/Chromium only — Firefox has no
+       equivalent pseudo-element, so on Firefox this falls back to icon-only, which
+       isn't a practical concern for an iOS/Android-focused PWA. */
+    .overlay-date-input::-webkit-calendar-picker-indicator {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
 
 .chevron-icon {
     color: var(--text-secondary);

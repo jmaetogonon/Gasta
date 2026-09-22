@@ -11,7 +11,8 @@
 
     @if (_paymentMethod is not null)
     {
-        <img src="images/payments/@(_paymentMethod.LogoImage).svg" class="header-logo" />
+        <PaymentMethodIcon LogoImage="@_paymentMethod.LogoImage" Name="@_paymentMethod.Name" ColorKey="@_paymentMethod.ColorKey"
+                           ShowBackground="false" ShowLabelWithFallback="true" Size="28" />
     }
 
     <div class="header-actions">

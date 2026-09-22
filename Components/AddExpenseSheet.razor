@@ -15,19 +15,21 @@
             <button class="close-btn" @onclick="Cancel">&#10005;</button>
         </div>
 
-        <div class="sheet-body">
+        <div class="sheet-body"> 
             <label class="field-label">Date</label>
-            <div class="field-input tappable" @onclick="OpenDatePicker">
-                <span>@Date.ToString("MMMM d, yyyy")</span>
-                <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-                    <rect x="3" y="5" width="18" height="16" rx="2" />
-                    <line x1="3" y1="10" x2="21" y2="10" />
-                    <line x1="8" y1="3" x2="8" y2="7" />
-                    <line x1="16" y1="3" x2="16" y2="7" />
-                </svg>
+            <div class="date-field-wrap">
+                <div class="field-input tappable">
+                    <span>@Date.ToString("MMMM d, yyyy")</span>
+                    <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                        <line x1="8" y1="3" x2="8" y2="7" />
+                        <line x1="16" y1="3" x2="16" y2="7" />
+                    </svg>
+                </div>
+                <input type="date" class="overlay-date-input"
+                       value="@Date.ToString("yyyy-MM-dd")" @onchange="OnDateChanged" />
             </div>
-            <input type="date" @ref="_dateInputRef" class="hidden-date-input"
-                   value="@Date.ToString("yyyy-MM-dd")" @onchange="OnDateChanged" />
 
             <label class="field-label">Expense</label>
             <div class="field-input tappable" @onclick="() => ShowKeypad = true">
@@ -122,21 +124,7 @@
     {
         if (DateTime.TryParse(e.Value?.ToString(), out var d))
             Date = d;
-    }
-
-    private async Task OpenDatePicker()
-    {
-        if (JS is IJSInProcessRuntime sync)
-        {
-            sync.InvokeVoid("gastaDate.showPicker", _dateInputRef);
-        }
-        else
-        {
-            // Fallback for any host that isn't in-process JS (shouldn't happen in
-            // Blazor WASM, but keeps this safe if that ever changes).
-            await JS.InvokeVoidAsync("gastaDate.showPicker", _dateInputRef);
-        }
-    }
+    } 
 
     private async Task Save()
     {
