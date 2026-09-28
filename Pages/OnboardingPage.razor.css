@@ -271,3 +271,8 @@
     cursor: pointer;
     font-family: var(--font-display);
 }
+
+    .get-started-button:disabled {
+        background: var(--border);
+        cursor: not-allowed;
+    }

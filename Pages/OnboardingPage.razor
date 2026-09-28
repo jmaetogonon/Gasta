@@ -71,7 +71,7 @@
             <input class="name-input" @bind="Nickname" @bind:event="oninput"
                    placeholder="e.g. Juan" maxlength="20" />
 
-            <button class="get-started-button" @onclick="Finish">Let's G!</button>
+            <button class="get-started-button" @onclick="Finish" disabled="@(string.IsNullOrEmpty(Nickname))">Let's G!</button>
         </div>
 
         <div class="nav-row">
