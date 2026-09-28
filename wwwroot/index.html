@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gasta</title>
-    <base href="/Gasta/" />
+    <base href="/" />
     <script>
         (function () {
             try {
@@ -36,9 +36,9 @@
                     <circle class="loading-ring-bar" cx="60" cy="60" r="54" />
                 </svg>
                 <div class="loading-video-wrap">
-                    <video class="loading-video" autoplay loop muted playsinline>
-                        <source src="videos/gasta-loading-transparent.webm" type="video/webm" />
-                    </video>
+                    <div class="loading-video-crop">
+                        <img class="loading-video" src="images/gasta-icon-square.gif" alt="Gasta" />
+                    </div> 
                 </div>
             </div>
             <div class="loading-percentage"></div>
@@ -76,5 +76,4 @@
         });
     </script>
 </body>
-
 </html>

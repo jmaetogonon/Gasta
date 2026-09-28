@@ -6,10 +6,18 @@
     <div class="budget-fixed-top">
         <div class="header-bar">
             <button class="icon-btn" @onclick="Cancel">&#10094;</button>
-            <span class="header-title">Set Your Monthly Budget</span>
         </div>
 
-        <p class="intro-text">Always have a budget so you know how much you can spend this month.</p>
+        <div class="header-content">
+            <div class="header-content-left">
+                <span class="header-title">Monthly Budget</span> 
+                <span class="intro-text">
+                    Syempre dapat may budget ka hindi yung
+                    si gastos ka lang ng gastos diba?
+                </span>
+            </div>
+            <img src="images/pepecry.gif" />
+        </div>
 
         <button class="past-months-button" @onclick="() => ShowCopySheet = true">
             Set from past months

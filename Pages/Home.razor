@@ -5,14 +5,15 @@
 @inject Gasta.Services.AddExpenseUiService AddExpenseUi
 @inject Services.ExpenseSummaryService SummaryService
 @inject Services.ThemeService ThemeService
+@inject Gasta.Services.UserProfileService UserProfile
 @inject NavigationManager Nav
 
 <div class="home-fixed">
 <div class="header">
-    <div class="avatar">H</div>
+        <div class="avatar">@AvatarInitial</div>
     <div class="month-switcher">
         <span @onclick="PreviousMonth">&#10094;</span>
-        <strong>@SelectedMonth.ToString("MMMM").ToUpper()</strong>
+        <strong>@SelectedMonth.ToString("MMMM")</strong>
         <span style="text-align:end;" @onclick="NextMonth">&#10095;</span>
     </div>
 </div>
@@ -167,6 +168,7 @@ else
 }
 
 @code {
+    private string AvatarInitial = "H"; // shown briefly before the async load resolves 
     private DateTime SelectedMonth = DateTime.Now;
     private decimal Budget, Total, Remaining;
     private double PercentSpent;
@@ -187,6 +189,8 @@ else
     protected override async Task OnInitializedAsync()
     {
         await LoadAsync();
+        var nickname = await UserProfile.GetNicknameAsync();
+        AvatarInitial = nickname[0].ToString().ToUpperInvariant();
         AddExpenseUi.OnExpenseSaved += HandleExpenseSaved;
     }
 

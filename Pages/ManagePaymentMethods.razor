@@ -2,10 +2,22 @@
 @inject Gasta.Data.Repositories.IPaymentMethodRepository PaymentMethodRepository
 @inject NavigationManager Nav
 
+<div class="top-fixed">
 <div class="header-bar">
     <button class="icon-btn" @onclick="@(() => Nav.NavigateTo("settings"))">&#10094;</button>
-    <span class="header-title">Manage Payment Methods</span>
 </div>
+ 
+<div class="header-content">
+            <div class="header-content-left">
+                <span class="header-title">Payment Methods</span> 
+                <span class="intro-text"> 
+                   Cashless ka man o cash, basta wag careless. @* 😂 *@
+                   @* Cash, card, o utang sa tropa? 😂 *@
+                </span>
+            </div>
+            <img src="images/mascot-settings.gif" />
+        </div>
+        </div>
 
 <div class="category-list-wrap">
     <div class="category-list">

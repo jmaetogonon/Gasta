@@ -2,10 +2,23 @@
 @inject Gasta.Data.Repositories.ICategoryRepository CategoryRepository
 @inject NavigationManager Nav
 
+<div class="top-fixed">
 <div class="header-bar">
     <button class="icon-btn" @onclick="@(() => Nav.NavigateTo("settings"))">&#10094;</button>
-    <span class="header-title">Manage Categories</span>
 </div>
+
+<div class="header-content">
+            <div class="header-content-left">
+                <span class="header-title">Categories</span> 
+                <span class="intro-text">
+                    Para alam kung food ba ’yan o “deserve ko ’to.” @* 😭 *@
+                    @* Para alam natin kung saan ka mahilig gumastos. 👀 *@
+                    @* Lagyan ng category para walang gastos na nawawala. 👀 *@
+                </span>
+            </div>
+            <img src="images/mascot-settings.gif" />
+        </div>
+        </div>
 
 <div class="category-list-wrap">
     <div class="category-list">

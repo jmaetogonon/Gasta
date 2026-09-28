@@ -22,6 +22,7 @@ builder.Services.AddScoped<SeedService>();
 builder.Services.AddScoped<ThemeService>();
 builder.Services.AddScoped<AddExpenseUiService>();
 builder.Services.AddSingleton<AlertService>();
+builder.Services.AddScoped<UserProfileService>();
 
 var host = builder.Build();
 

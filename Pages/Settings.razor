@@ -2,13 +2,38 @@
 @inject Gasta.Services.ThemeService ThemeService
 @inject Gasta.Data.IndexedDbService IndexedDbService
 @inject Gasta.Services.SeedService SeedService
+@inject Gasta.Services.UserProfileService UserProfile
 @inject Gasta.Services.AlertService Alert
 @inject NavigationManager Nav
 
 <PageTitle>Gasta - Settings</PageTitle>
+ 
+<div class="header-content">
+            <div class="header-content-left">
+                <span class="header-title">Settings</span> 
+                <span class="intro-text">
+                    Settings muna bago gastos. Para kahit papaano, may plano ang kagastusan mo.
+                    @* Settings muna bago gastos. Para may plano naman.  *@
+                </span>
+            </div>
+            <img src="images/mascot-settings.gif" />
+        </div>
 
-<div class="header">
-    <span class="screen-title">SETTINGS</span>
+<div class="section">
+    <span class="section-label">Profile</span>
+    <div class="list-card nickname-card">
+        <div class="nickname-row"> 
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+  <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+</svg>
+            <input class="nickname-input" @bind="Nickname" @bind:event="oninput" placeholder="Your name" maxlength="20" />
+            <button class="save-nickname-btn" hidden="@(!NicknameChanged)" @onclick="SaveNickname">Save</button>
+        </div>
+    </div>
+    @if (NicknameSaved)
+    {
+        <div class="inline-note success-note">Saved!</div>
+    }
 </div>
 
 <div class="section">
@@ -48,7 +73,7 @@
             </label>
         </div>
     </div>
-    <div class="inline-note">Reminder preference is saved, but no notifications are sent yet.</div>
+  @*<div class="inline-note">Reminder preference is saved, but no notifications are sent yet.</div>*@  
 </div>
 
 <div class="section">
@@ -61,7 +86,7 @@
 </div>
 
 <div class="about-footer">
-    GASTA v1.0.0 (Blazor)
+    GASTA v1.0.0
 </div>
 
 @code {
@@ -71,6 +96,12 @@
     private bool BudgetReminders;
     private bool ResetDone;
 
+    private string Nickname = "";
+    private string _originalNickname = "";
+    private bool NicknameSaved;
+    private bool NicknameChanged =>
+        !string.IsNullOrWhiteSpace(Nickname) && Nickname.Trim() != _originalNickname;
+
     [Inject] private IJSRuntime JS { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
@@ -78,6 +109,8 @@
         CurrentTheme = await ThemeService.GetCurrentAsync();
         var saved = await JS.InvokeAsync<string?>("localStorage.getItem", RemindersKey);
         BudgetReminders = saved == "true";
+
+        Nickname = _originalNickname = await UserProfile.GetNicknameAsync();
     }
 
     private async Task SetTheme(string option)
@@ -91,6 +124,18 @@
         await JS.InvokeVoidAsync("localStorage.setItem", RemindersKey, BudgetReminders ? "true" : "false");
     }
 
+    private async Task SaveNickname()
+    {
+        var trimmed = Nickname.Trim();
+        await UserProfile.SetNicknameAsync(trimmed);
+        _originalNickname = trimmed;
+        NicknameSaved = true;
+        StateHasChanged();
+        await Task.Delay(1500);
+        NicknameSaved = false;
+        StateHasChanged();
+    }
+
     private async Task ShowComingSoon(string feature)
     {
         await Alert.ShowAsync($"{feature} is coming soon.", "Coming Soon");
@@ -99,7 +144,7 @@
     private async Task DoReset()
     {
         var confirmed = await Alert.ShowConfirmAsync(
-            "This will erase everything and reseed demo data. Are you sure?",
+            "This will erase everything, including your name, and start fresh. Are you sure?",
             "Reset All Data",
             confirmText: "Reset",
             cancelText: "Cancel");
@@ -108,6 +153,13 @@
 
         await IndexedDbService.ClearAllAsync();
         await SeedService.SeedIfEmptyAsync();
+
+        // Fresh start entirely — not just the database. Clearing profile means
+        // MainLayout's onboarding check fails again on next launch, so the person
+        // walks through onboarding (including picking a new nickname) instead of
+        // landing on an empty Home still showing their old name.
+        await UserProfile.ClearProfileAsync();
+
         ResetDone = true;
         StateHasChanged();
         await Task.Delay(1200);

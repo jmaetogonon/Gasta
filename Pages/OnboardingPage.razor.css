@@ -1,0 +1,273 @@
+﻿.onboarding-page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.theme-toggle-row {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.theme-toggle-btn {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Welcome step */
+.welcome-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    padding: 0 8px;
+}
+
+.icon-outer {
+    position: relative;
+    width: 100%;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+}
+
+.icon-crop {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.app-icon-gif {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Dark mode: circular mask + white backdrop, applied to the INNER .icon-crop only —
+   never to .icon-outer. Keeping overflow:hidden off the outer element is what lets
+   the pulse rings below actually show: they live on .icon-outer's pseudo-elements
+   and scale up past the circle's edge as part of the effect, which the crop
+   wrapper would otherwise clip. */
+.icon-outer.dark {
+    width: 160px;
+}
+.icon-outer.dark .icon-crop {
+    border-radius: 50%;
+    background: #efedfa;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.icon-outer.dark::before,
+.icon-outer.dark::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.55);
+    animation: iconPulse 2.6s ease-out infinite;
+    pointer-events: none;
+}
+
+.icon-outer.dark::after {
+    animation-delay: 1.3s;
+}
+
+@keyframes iconPulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1.18);
+        opacity: 0;
+    }
+}
+
+.welcome-title {
+    font-size: 1.375rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+}
+
+.welcome-body {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    max-width: 300px;
+}
+
+.hints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 22px;
+}
+
+.hint-row {
+    font-size: 0.625rem;
+    color: var(--text-secondary);
+}
+
+/* Slides */
+.slide-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 14px;
+    padding: 0 12px;
+}
+
+.slide-icon {
+    color: var(--color-primary);
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: var(--surface-alt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+} 
+
+.slide-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+}
+
+.slide-body {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    max-width: 280px;
+}
+
+.dots-row {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    margin: 20px 0;
+}
+
+.dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.2s ease, width 0.2s ease;
+}
+
+    .dot.active {
+        background: var(--color-primary);
+        width: 20px;
+        border-radius: 4px;
+    }
+
+.nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 12px 8px;
+}
+
+.next-button {
+    border: none;
+    background: var(--color-primary);
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 13px 32px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-family: var(--font-display);
+}
+
+/* Name step */
+.name-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+    padding: 0 8px;
+}
+
+.name-emoji {
+    font-size: 2.5rem;
+    margin-bottom: 6px;
+}
+
+.name-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+}
+
+.name-subtitle {
+    font-size: 0.813rem;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.name-input {
+    width: 100%;
+    max-width: 280px;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0 16px;
+    height: 52px;
+    background: var(--surface-alt);
+    font-size: 0.938rem;
+    text-align: center;
+    font-family: var(--font-display);
+    margin-bottom: 18px;
+    color: var(--text-primary);
+}
+
+.get-started-button {
+    width: 100%;
+    max-width: 280px;
+    border: none;
+    background: var(--color-primary);
+    color: white;
+    font-weight: 600;
+    font-size: 0.938rem;
+    padding: 15px;
+    border-radius: 14px;
+    cursor: pointer;
+    font-family: var(--font-display);
+}

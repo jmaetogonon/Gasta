@@ -86,6 +86,7 @@
     background: var(--surface-alt);
     font-size: 14px;
     color: var(--text-primary);
+    font-family: var(--font-display);
 }
 
 .color-grid {
