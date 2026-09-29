@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gasta</title>
-    <base href="/Gasta/" />
+    <base href="/" />
     <script>
         (function () {
             try {
@@ -38,7 +38,7 @@
                 <div class="loading-video-wrap">
                     <div class="loading-video-crop">
                         <img class="loading-video" src="images/gasta-icon-square.gif" alt="Gasta" />
-                    </div> 
+                    </div>
                 </div>
             </div>
             <div class="loading-percentage"></div>
@@ -55,25 +55,28 @@
     <!--<script src="/js/db.js"></script>-->
     <script src="js/theme.js"></script>
     <script src="js/pointer.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/settingsHeader.js"></script>
+    <script src="js/accentColor.js"></script>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
     <!--<script>navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });</script>-->
 
     <script>
-        navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });
+                navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' });
 
-        // Without this, even after the new worker takes over (skipWaiting +
-        // clients.claim in service-worker.published.js), an already-open tab keeps
-        // running on the old cached JS/WASM/CSS already loaded into memory — this
-        // reloads once, automatically, when control actually changes hands, so the
-        // tab picks up the new version instead of sitting in a stale/mixed state.
-        // hasReloaded guards against a reload loop, since controllerchange can in
-        // some browsers fire more than once for a single update.
-        let hasReloaded = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (hasReloaded) return;
-            hasReloaded = true;
-            window.location.reload();
-        });
+                // Without this, even after the new worker takes over (skipWaiting +
+                // clients.claim in service-worker.published.js), an already-open tab keeps
+                // running on the old cached JS/WASM/CSS already loaded into memory — this
+                // reloads once, automatically, when control actually changes hands, so the
+                // tab picks up the new version instead of sitting in a stale/mixed state.
+                // hasReloaded guards against a reload loop, since controllerchange can in
+                // some browsers fire more than once for a single update.
+                let hasReloaded = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (hasReloaded) return;
+                    hasReloaded = true;
+                    window.location.reload();
+                });
     </script>
 </body>
 </html>

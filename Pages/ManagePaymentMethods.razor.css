@@ -39,6 +39,10 @@
 
     .header-content img {
         height: 80px;
+        width: auto;
+        max-width: 96px;
+        object-fit: contain;
+        flex-shrink: 0;
     }
 
 .header-content-left {

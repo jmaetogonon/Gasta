@@ -7,6 +7,9 @@ public interface ICategoryBudgetRepository
     Task<List<CategoryBudget>> GetAllForMonthAsync(int year, int month);
     Task<CategoryBudget?> GetForCategoryMonthAsync(int categoryId, int year, int month);
     Task SetForCategoryMonthAsync(int categoryId, int year, int month, decimal amount);
+    /// <summary>Every category budget ever set, across all months and categories.
+    /// Used by the Data & Backup export for full budget history.</summary>
+    Task<List<CategoryBudget>> GetAllAsync();
 }
 
 public class CategoryBudgetRepository : ICategoryBudgetRepository
@@ -33,4 +36,7 @@ public class CategoryBudgetRepository : ICategoryBudgetRepository
         var id = await _db.PutAsync(Store, budget);
         budget.Id = id;
     }
+
+    public async Task<List<CategoryBudget>> GetAllAsync() =>
+        (await _db.GetAllAsync<CategoryBudget>(Store)).ToList();
 }

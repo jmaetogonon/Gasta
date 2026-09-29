@@ -69,6 +69,7 @@
 @inherits LayoutComponentBase
 @inject Gasta.Services.AddExpenseUiService AddExpenseUi
 @inject Gasta.Services.UserProfileService UserProfile
+@inject Gasta.Services.AccentColorService AccentColor
 @inject NavigationManager Nav
 @implements IDisposable
 
@@ -89,10 +90,10 @@
     </NavLink>
 
     <NavLink href="alltransactions" class="nav-item" Match="NavLinkMatch.All">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
-            <line x1="4" y1="6" x2="20" y2="6" />
-            <line x1="4" y1="12" x2="20" y2="12" />
-            <line x1="4" y1="18" x2="14" y2="18" />
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+            <line x1="7" y1="15" x2="11" y2="15" />
         </svg>
     </NavLink>
 
@@ -123,6 +124,7 @@
     protected override async Task OnInitializedAsync()
     {
         AddExpenseUi.OnChanged += HandleChanged;
+        await AccentColor.ApplyCurrentAsync();
 
         // Only pages using THIS layout hit this check — OnboardingPage declares its
         // own @layout, so it never runs through here, no route-string comparison or
