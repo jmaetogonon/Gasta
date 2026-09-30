@@ -13,9 +13,9 @@ public record AccentPreset(
 /// that redefines --color-primary/--color-primary-dark/--nav-active-bg for BOTH the
 /// light (:root) and dark ([data-theme="dark"]) selectors, same shape as theme.css
 /// itself, so it participates correctly in the light/dark cascade instead of
-/// overriding it. A plain inline style on &lt;html&gt; would NOT work here — inline
-/// styles beat both selectors' specificity, permanently locking one accent
-/// regardless of theme toggle.
+/// overriding it. Backgrounds/surfaces/borders are NOT touched here in either theme —
+/// light mode keeps its original purple-tinted neutrals regardless of accent, and
+/// dark mode uses the shared neutral base defined directly in theme.css.
 /// </summary>
 public class AccentColorService
 {
@@ -24,12 +24,6 @@ public class AccentColorService
 
     public AccentColorService(IJSRuntime js) => _js = js;
 
-    // Every button/text-contrast pairing below was checked against the same
-    // perceived-luminance formula ColorHelper.ReadableTextColor uses, targeting
-    // roughly the same luminance ceiling the app's existing default purple already
-    // sits at (~100-131), so white button/icon text reads comfortably on every
-    // preset in both themes. Hand-picked hues, not colorimetrically derived —
-    // nudge any of these later if one looks off once actually seen rendered.
     public static readonly List<AccentPreset> Presets = new()
     {
         new("purple", "Purple", "#5B4FE8", "#5B4FE8", "#4A3FC4", "#C9C2F5", "#7C6FFF", "#6355E0", "#453E7A"),
@@ -47,8 +41,6 @@ public class AccentColorService
         return Presets.Any(p => p.Id == saved) ? saved! : "purple";
     }
 
-    /// <summary>Re-applies whatever accent was last saved — call once on app start
-    /// (MainLayout.OnInitializedAsync) so the choice persists across reloads.</summary>
     public async Task ApplyCurrentAsync() => await ApplyInternal(await GetCurrentPresetIdAsync());
 
     public async Task SetAsync(string presetId)

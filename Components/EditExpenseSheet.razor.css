@@ -5,7 +5,7 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
-    z-index: 20;
+    z-index: 20; 
 }
 
     .sheet-scrim.open {
@@ -19,10 +19,11 @@
     right: 0;
     bottom: 0;
     max-height: 88vh;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     background: var(--surface);
     border-radius: 20px 20px 0 0;
-    padding: 20px 18px 28px;
+    overflow: hidden; /* clips the banner's corners to match the sheet's own rounding */
     transform: translateY(100%);
     transition: transform 0.3s ease;
     z-index: 21;
@@ -33,17 +34,55 @@
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
     }
 
+.sheet-banner {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 18px;
+    background: var(--color-primary);
+    background: linear-gradient( 110deg, color-mix(in srgb, var(--color-primary) 85%, black) 0%, var(--color-primary) 35%, var(--color-primary) 65%, color-mix(in srgb, var(--color-primary) 85%, black) 100% );
+}
+
 .sheet-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 14px;
-}
+} 
 
 .sheet-title {
     font-weight: bold;
     font-size: 1rem;
     font-family: var(--font-display);
+}
+
+.banner-title {
+    color: white;
+    font-weight: bold;
+    font-size: 0.875rem;
+    letter-spacing: 0.3px;
+    font-family: var(--font-display);
+}
+
+.close-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.28);
+    color: white;
+    font-size: 0.813rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sheet-body {
+    padding: 20px 18px 28px;
+    overflow-y: auto;
 }
 
 .field-label {

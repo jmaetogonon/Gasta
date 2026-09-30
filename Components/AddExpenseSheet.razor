@@ -12,20 +12,18 @@
 <div class="sheet-scrim @(IsOpen ? "open" : "")" @onclick="Cancel"></div>
 <div class="sheet-panel @(IsOpen ? "open" : "")" @onclick:stopPropagation="true">
 
-    @if (Category is not null)
-    {
+     
         <div class="sheet-banner">
-            <span class="banner-title">ADD @Category.Name.ToUpper() EXPENSE</span>
+            @if (Category is not null) 
+            {
+                <span class="banner-title">Add @Category.Name Expense</span>
+            }
+            else
+            { 
+             <span class="banner-title">Add Expense</span>
+            }
             <button class="close-btn" @onclick="Cancel">&#10005;</button>
-        </div>
-    }
-    else
-    { 
-        <div class="sheet-header">
-            <span class="sheet-title">Add Expense</span>
-            <button class="close-btn" @onclick="Cancel">&#10005;</button>
-        </div>
-    }
+        </div> 
 
     <div class="sheet-body">
         <label class="field-label">Date</label>

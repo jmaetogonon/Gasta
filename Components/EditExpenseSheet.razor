@@ -9,11 +9,13 @@
     <div class="sheet-notch"></div>
 
     @if (_loaded)
-    {
-        <div class="sheet-header">
-            <span class="sheet-title">Edit Expense</span>
-        </div>
+    { 
+        <div class="sheet-banner">          
+            <span class="banner-title">Edit Expense</span>
+            <button class="close-btn" @onclick="Cancel">&#10005;</button>
+        </div> 
 
+        <div class="sheet-body">
         <label class="field-label">Date</label>
         <div class="date-field-wrap">
             <div class="field-input tappable">
@@ -75,6 +77,7 @@
         <div class="action-row">
             <button class="cancel-button" @onclick="Cancel">Cancel</button>
             <button class="save-button" disabled="@(!CanSave)" @onclick="Save">Save</button>
+        </div>
         </div>
     }
 </div>
