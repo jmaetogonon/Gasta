@@ -135,12 +135,7 @@
     justify-content: center;
     flex-shrink: 0;
 }
-
-    .preview-icon img {
-        max-width: 16px;
-        max-height: 16px;
-    }
-
+ 
 .preview-name {
     flex: 1;
     font-size: 12px;

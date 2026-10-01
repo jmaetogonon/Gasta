@@ -32,7 +32,7 @@
                 {
                     <div class="preview-row">
                         <div class="preview-icon" style="background:@ColorHelper.Lighten(row.ColorKey, 0.75);">
-                            <img src="images/categories/@(row.LogoImage).png" />
+                            <CategoryIcon IconKey="@row.IconKey" LogoImage="@row.LogoImage" Color="@row.ColorKey" Size="16" />
                         </div>
                         <span class="preview-name">@row.Name</span>
                         <span class="preview-amount">@row.Amount.ToString("₱#,##0")</span>
