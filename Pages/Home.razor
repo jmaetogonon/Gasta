@@ -9,69 +9,69 @@
 @inject NavigationManager Nav
 
 <div class="home-fixed">
-<div class="header">
+    <div class="header">
         <div class="avatar">@AvatarInitial</div>
-    <div class="month-switcher">
-        <span @onclick="PreviousMonth">&#10094;</span>
-        <strong>@SelectedMonth.ToString("MMMM")</strong>
-        <span style="text-align:end;" @onclick="NextMonth">&#10095;</span>
-    </div>
-</div>
-
-<div class="overview-card">
-    <div class="overview-top">
-        <div class="overview-text">
-            <span class="eyebrow">MONTHLY OVERVIEW</span>
-            <span class="overview-label">TOTAL EXPENSES</span>
-            <div class="amount-display">@Total.ToString("₱#,##0.00")</div>
-            <div class="progress-track">
-                <div class="progress-fill" style="width:@((PercentSpent * 100).ToString(System.Globalization.CultureInfo.InvariantCulture))%;"></div>
-            </div>
-            <div class="progress-captions">
-                <span>@((PercentSpent * 100).ToString("0"))% of budget</span>
-                <span>@((PercentSpent * 100).ToString("0"))% used</span>
-            </div>
+        <div class="month-switcher">
+            <span @onclick="PreviousMonth">&#10094;</span>
+            <strong>@SelectedMonth.ToString("MMMM")</strong>
+            <span style="text-align:end;" @onclick="NextMonth">&#10095;</span>
         </div>
-        @if (ThemeService.IsDark)
-        {
-            <img src="images/illustrations/monthly-overview-dark.png" class="overview-illustration-dark" alt="" />
-        }
-        else
-        {
-            <img src="images/illustrations/monthly-overview.png" class="overview-illustration" alt="" />
-        }
     </div>
 
-    <div class="overview-divider"></div>
-
-    <div class="budget-row">
-        <div><span class="caption">Monthly Budget</span><strong>@Budget.ToString("₱#,##0.00")</strong></div>
-        <div><span class="caption">Spent</span><strong>@Total.ToString("₱#,##0.00")</strong></div>
-        <div><span class="caption">Remaining</span><strong class="@(Remaining < 0 ? "danger-text" : "success")">@Remaining.ToString("₱#,##0.00")</strong></div>
-    </div>
-
-    <button class="ghost-button" style="width:100%;margin-top:10px;" @onclick="@(() => Nav.NavigateTo("managebudget"))">Edit Monthly Budget</button>
-</div>
-
-<div class="tabs">
-    <span class="@(!IsPaymentsTab ? "tab active" : "tab")" @onclick="() => IsPaymentsTab = false">CATEGORIES</span>
-    <span class="@(IsPaymentsTab ? "tab active" : "tab")" @onclick="() => IsPaymentsTab = true">PAYMENTS</span>
-    <div class="view-toggle" @onclick="ToggleCurrentView">
-        <span class="view-icon">
-            @if (CurrentGridView)
+    <div class="overview-card">
+        <div class="overview-top">
+            <div class="overview-text">
+                <span class="eyebrow">MONTHLY OVERVIEW</span>
+                <span class="overview-label">TOTAL EXPENSES</span>
+                <div class="amount-display">@Total.ToString("₱#,##0.00")</div>
+                <div class="progress-track">
+                    <div class="progress-fill" style="width:@((PercentSpent * 100).ToString(System.Globalization.CultureInfo.InvariantCulture))%;"></div>
+                </div>
+                <div class="progress-captions">
+                    <span>@((PercentSpent * 100).ToString("0"))% of budget</span>
+                    <span>@((PercentSpent * 100).ToString("0"))% used</span>
+                </div>
+            </div>
+            @if (ThemeService.IsDark)
             {
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grid" viewBox="0 0 16 16">
-                    <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z" />
-                </svg>
+                <img src="images/illustrations/monthly-overview-dark.png" class="overview-illustration-dark" alt="" />
             }
             else
             {
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
-                </svg>
+                <img src="images/illustrations/monthly-overview.png" class="overview-illustration" alt="" />
             }
-        </span>
+        </div>
+
+        <div class="overview-divider"></div>
+
+        <div class="budget-row">
+            <div><span class="caption">Monthly Budget</span><strong>@Budget.ToString("₱#,##0.00")</strong></div>
+            <div><span class="caption">Spent</span><strong>@Total.ToString("₱#,##0.00")</strong></div>
+            <div><span class="caption">Remaining</span><strong class="@(Remaining < 0 ? "danger-text" : "success")">@Remaining.ToString("₱#,##0.00")</strong></div>
+        </div>
+
+        <button class="ghost-button" style="width:100%;margin-top:10px;" @onclick="@(() => Nav.NavigateTo("managebudget"))">Edit Monthly Budget</button>
     </div>
+
+    <div class="tabs">
+        <span class="@(!IsPaymentsTab ? "tab active" : "tab")" @onclick="() => IsPaymentsTab = false">CATEGORIES</span>
+        <span class="@(IsPaymentsTab ? "tab active" : "tab")" @onclick="() => IsPaymentsTab = true">PAYMENTS</span>
+        <div class="view-toggle" @onclick="ToggleCurrentView">
+            <span class="view-icon">
+                @if (CurrentGridView)
+                {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grid" viewBox="0 0 16 16">
+                        <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z" />
+                    </svg>
+                }
+                else
+                {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
+                    </svg>
+                }
+            </span>
+        </div>
     </div>
 </div>
 
@@ -168,7 +168,7 @@ else
 }
 
 @code {
-    private string AvatarInitial = "H"; // shown briefly before the async load resolves 
+    private string AvatarInitial = "H"; // shown briefly before the async load resolves
     private DateTime SelectedMonth = DateTime.Now;
     private decimal Budget, Total, Remaining;
     private double PercentSpent;

@@ -5,13 +5,13 @@
 @inject Gasta.Data.IndexedDbService IndexedDbService
 @inject Gasta.Services.SeedService SeedService
 @inject Gasta.Services.UserProfileService UserProfile
+@inject Gasta.Services.AccentColorService AccentColor
 @inject Gasta.Services.AlertService Alert
 @inject Gasta.Data.Repositories.IExpenseRepository ExpenseRepository
 @inject Gasta.Data.Repositories.ICategoryRepository CategoryRepository
 @inject Gasta.Data.Repositories.IPaymentMethodRepository PaymentMethodRepository
 @inject Gasta.Data.Repositories.IBudgetRepository BudgetRepository
 @inject Gasta.Data.Repositories.ICategoryBudgetRepository CategoryBudgetRepository
-@inject Gasta.Services.AccentColorService AccentColor
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 
@@ -35,9 +35,9 @@
     <div class="list-card">
         <div class="list-row no-hover">
             <div class="icon-badge">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
-  <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
-</svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                </svg>
             </div>
             <input class="nickname-input" @bind="Nickname" @bind:event="oninput" placeholder="Your name" maxlength="20" />
             <button class="save-nickname-btn" hidden="@(!NicknameChanged)" @onclick="SaveNickname">Save</button>
@@ -63,36 +63,18 @@
             </div>
         </div>
 
-        <div class="list-row" @onclick="() => ShowAccent = !ShowAccent">
+        <div class="list-row" @onclick="() => ShowAccentSheet = true">
             <div class="icon-badge accent-preview-badge" style="background:@CurrentAccentHex;"></div>
             <div class="list-row-text">
                 <span class="list-row-label">Accent Color</span>
                 <span class="list-row-sublabel">@CurrentAccentName</span>
             </div>
-            <span class="chevron @(ShowAccent ? "chevron-open" : "")">&#10095;</span>
+            <span class="chevron">&#10095;</span>
         </div>
-
-        @if (ShowAccent)
-        {
-            <div class="accent-body">
-                <div class="accent-grid">
-                    @foreach (var preset in Gasta.Services.AccentColorService.Presets)
-                    {
-                        <div class="accent-item" @onclick="() => SelectAccent(preset.Id)">
-                            <div class="accent-swatch @(SelectedAccentId == preset.Id ? "selected" : "")" style="background:@preset.SwatchHex;">
-                                @if (SelectedAccentId == preset.Id)
-                                {
-                                    <span class="accent-check">&#10003;</span>
-                                }
-                            </div>
-                            <span class="accent-name">@preset.Name</span>
-                        </div>
-                    }
-                </div>
-            </div>
-        }
     </div>
 </div>
+
+<AccentColorSheet IsOpen="ShowAccentSheet" IsOpenChanged="OnAccentSheetOpenChanged" />
 
 <div class="section">
     <span class="section-label">Manage</span>
@@ -125,7 +107,7 @@
     <div class="backup-card">
         <div class="backup-header" @onclick="() => ShowBackup = !ShowBackup">
             <div class="icon-badge">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                     <ellipse cx="12" cy="5" rx="8" ry="3" />
                     <path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5" />
                     <path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3" />
@@ -168,7 +150,7 @@
                 <div class="file-row-wrap">
                     <div class="file-row">
                         <div class="icon-badge">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2Z" />
                             </svg>
                         </div>
@@ -227,7 +209,7 @@
 </div>
 
 <div class="about-footer">
-    Made with 💜 for Gastadoras
+    Made with 💜 for Pinoy budgeting
 </div>
 
 @code {
@@ -236,20 +218,19 @@
     private ElementReference _headerRef;
     private ElementReference _sentinelRef;
 
-    private string CurrentTheme = "Light"; 
+    private string CurrentTheme = "Light";
     private bool ResetDone;
     private bool IsBusy;
     private bool ShowBackup;
+    private bool ShowAccentSheet;
+    private string SelectedAccentId = "purple";
 
-    private bool ShowAccent;
-private string SelectedAccentId = "purple";
+    private Gasta.Services.AccentPreset CurrentAccentPreset =>
+        Gasta.Services.AccentColorService.Presets.FirstOrDefault(p => p.Id == SelectedAccentId)
+        ?? Gasta.Services.AccentColorService.Presets[0];
 
-private Gasta.Services.AccentPreset CurrentAccentPreset =>
-    Gasta.Services.AccentColorService.Presets.FirstOrDefault(p => p.Id == SelectedAccentId)
-    ?? Gasta.Services.AccentColorService.Presets[0];
-
-private string CurrentAccentHex => CurrentAccentPreset.SwatchHex;
-private string CurrentAccentName => CurrentAccentPreset.Name;
+    private string CurrentAccentHex => CurrentAccentPreset.SwatchHex;
+    private string CurrentAccentName => CurrentAccentPreset.Name;
 
     private string Nickname = "";
     private string _originalNickname = "";
@@ -263,8 +244,8 @@ private string CurrentAccentName => CurrentAccentPreset.Name;
     protected override async Task OnInitializedAsync()
     {
         CurrentTheme = await ThemeService.GetCurrentAsync();
-        SelectedAccentId = await AccentColor.GetCurrentPresetIdAsync();
         Nickname = _originalNickname = await UserProfile.GetNicknameAsync();
+        SelectedAccentId = await AccentColor.GetCurrentPresetIdAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -287,11 +268,17 @@ private string CurrentAccentName => CurrentAccentPreset.Name;
         await ThemeService.ApplyAsync(option);
     }
 
-    private async Task SelectAccent(string presetId)
-{
-    SelectedAccentId = presetId;
-    await AccentColor.SetAsync(presetId); // applies instantly — no reload needed
-}
+    private async Task OnAccentSheetOpenChanged(bool open)
+    {
+        ShowAccentSheet = open;
+        if (!open)
+        {
+            // Sheet applies changes instantly to the live document via the service,
+            // but this page's own cached SelectedAccentId needs a manual refresh so
+            // the collapsed row's preview swatch/name reflect whatever was chosen.
+            SelectedAccentId = await AccentColor.GetCurrentPresetIdAsync();
+        }
+    }
 
     private async Task SaveNickname()
     {
@@ -468,23 +455,35 @@ private string CurrentAccentName => CurrentAccentPreset.Name;
         {
             await CategoryRepository.SaveAsync(new Gasta.Models.Category
             {
-                Id = c.Id, Name = c.Name, LogoImage = c.LogoImage, IconKey = c.IconKey,
-                ColorKey = c.ColorKey, SortOrder = c.SortOrder
+                Id = c.Id,
+                Name = c.Name,
+                LogoImage = c.LogoImage,
+                IconKey = c.IconKey,
+                ColorKey = c.ColorKey,
+                SortOrder = c.SortOrder
             });
         }
         foreach (var m in backup.PaymentMethods)
         {
             await PaymentMethodRepository.SaveAsync(new Gasta.Models.PaymentMethod
             {
-                Id = m.Id, Name = m.Name, LogoImage = m.LogoImage, ColorKey = m.ColorKey, SortOrder = m.SortOrder
+                Id = m.Id,
+                Name = m.Name,
+                LogoImage = m.LogoImage,
+                ColorKey = m.ColorKey,
+                SortOrder = m.SortOrder
             });
         }
         foreach (var e in backup.Expenses)
         {
             await ExpenseRepository.SaveAsync(new Gasta.Models.Expense
             {
-                Id = e.Id, Date = e.Date, Amount = e.Amount,
-                CategoryId = e.CategoryId, PaymentMethodId = e.PaymentMethodId, Notes = e.Notes
+                Id = e.Id,
+                Date = e.Date,
+                Amount = e.Amount,
+                CategoryId = e.CategoryId,
+                PaymentMethodId = e.PaymentMethodId,
+                Notes = e.Notes
             });
         }
 
@@ -539,7 +538,11 @@ private string CurrentAccentName => CurrentAccentPreset.Name;
 
             await ExpenseRepository.SaveAsync(new Gasta.Models.Expense
             {
-                Date = date, Amount = amount, CategoryId = category.Id, PaymentMethodId = method.Id, Notes = notes
+                Date = date,
+                Amount = amount,
+                CategoryId = category.Id,
+                PaymentMethodId = method.Id,
+                Notes = notes
             });
             imported++;
         }
@@ -587,6 +590,8 @@ private string CurrentAccentName => CurrentAccentPreset.Name;
         await IndexedDbService.ClearAllAsync();
         await SeedService.SeedIfEmptyAsync();
         await UserProfile.ClearProfileAsync();
+        await ThemeService.ApplyAsync("Light");
+        await AccentColor.ResetToDefaultAsync();
 
         ResetDone = true;
         StateHasChanged();
