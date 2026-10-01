@@ -31,7 +31,8 @@ public class AccentColorService
         new("teal",   "Teal",   "#12A594", "#12A594", "#0D8577", "#B7E8E1", "#26B39C", "#1D8F7D", "#1F5C52"),
         new("coral",  "Coral",  "#E85B4F", "#E85B4F", "#C43F35", "#F5C9C2", "#D45E4F", "#B84A3D", "#7A3E3E"),
         new("rose",   "Rose",   "#E84F91", "#E84F91", "#C43575", "#F5C2DD", "#E0568F", "#C43F73", "#7A3E5C"),
-        new("amber",  "Amber",  "#A87A15", "#A87A15", "#8A6410", "#F0DDB0", "#B3812A", "#93691F", "#6B5320"),
+        new("amber",  "Amber",  "#A87A15", "#A87A15", "#8A6410", "#F0DDB0", "#B3812A", "#93691F", "#6B5320"),        
+        new("gold",   "Gold",   "#B8850F", "#B8850F", "#936A0C", "#F3E3B4", "#B98A0F", "#93690C", "#5C4515"), 
         new("slate",  "Slate",  "#5B6B8C", "#5B6B8C", "#45526B", "#C9D2E0", "#6E82AC", "#556694", "#3A4356"),
     };
 

@@ -40,8 +40,10 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px 18px;
-    background: var(--color-primary); 
-    background: linear-gradient( 110deg, color-mix(in srgb, var(--color-primary) 85%, black) 0%, var(--color-primary) 35%, var(--color-primary) 65%, color-mix(in srgb, var(--color-primary) 85%, black) 100% );
+    background: linear-gradient(150deg, var(--color-primary), var(--color-primary-dark));
+    box-shadow: 0 2px 7px color-mix(in srgb, var(--color-primary) 30%, transparent);
+    position: relative;
+    z-index: 1;
 }
 
 .sheet-header {

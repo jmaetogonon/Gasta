@@ -44,33 +44,46 @@
         margin: 0 4px;
     }
 
-/* Was a solid green block — flat and heavy next to the rest of the app's white-card
-   language (Home's overview card, Stats' total-spent card). Switched to the same
-   white-card-with-colored-accent pattern used everywhere else, so this page stops
-   looking like a visual outlier. */
+
+
+/* Reuses the same 150deg primary->primary-dark gradient as MainLayout's Add FAB and
+   AddExpenseSheet's banner, so this reads as the same "hero primary surface"
+   language rather than a one-off style — works automatically across all accent
+   presets in both themes since it's built from --color-primary/--color-primary-dark. */
 .total-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(150deg, var(--color-primary), var(--color-primary-dark));
     border-radius: var(--radius-lg, 20px);
-    box-shadow: var(--shadow-soft);
-    padding: 16px 18px;
+    box-shadow: 0 4px 18px color-mix(in srgb, var(--color-primary) 35%, transparent);
+    padding: 18px 20px 20px;
     margin-top: 16px;
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
+/* Decorative "card chip" glyph, low-opacity, top-right — a cheap way to read as a
+   physical debit/credit card without needing an image asset. */
+.total-card-chip {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    color: white;
+    opacity: 0.35;
+}
+
 .total-label {
     font-size: 0.625rem;
-    color: var(--text-secondary);
-    letter-spacing: 0.4px;
+    color: rgba(255, 255, 255, 0.75);
+    letter-spacing: 0.5px;
 }
 
 .total-amount {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 600;
     font-family: var(--font-display);
-    color: var(--success);
+    color: white;
 }
 
 .toolbar-row {

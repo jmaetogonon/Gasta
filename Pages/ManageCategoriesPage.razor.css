@@ -31,18 +31,18 @@
 
 .header-content {
     display: flex;
-    gap: 20px;
-    align-items: flex-end;
-    flex: 1;
+    gap: 14px;
+    align-items: flex-start;
     min-width: 0;
 }
 
     .header-content img {
-        height: 80px;
+        height: 70px;
         width: auto;
         max-width: 96px;
         object-fit: contain;
         flex-shrink: 0;
+        transition: height 0.25s ease, opacity 0.2s ease;
     }
 
 .header-content-left {
@@ -50,6 +50,7 @@
     flex-direction: column;
     gap: 4px;
     min-width: 0;
+    flex: 1;
 }
 
 .header-title {
@@ -60,7 +61,7 @@
 
 .intro-text {
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 1.4;
 }
 
