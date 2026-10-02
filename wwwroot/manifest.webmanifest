@@ -9,7 +9,7 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "gasta.png",
+      "src": "gastalogo.png",
       "type": "image/png",
       "sizes": "512x512"
     },

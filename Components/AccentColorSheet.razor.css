@@ -96,7 +96,8 @@
 }
 
     .accent-rect.selected {
-        border-color: var(--text-primary);
+        border: 2px solid var(--bg);
+        box-shadow: 0 0 0 2px var(--color-primary), 0 4px 10px rgba(0, 0, 0, 0.18);
     }
 
 .accent-rect-check {
@@ -107,7 +108,7 @@
     height: 18px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.9);
-    color: var(--text-primary);
+    color: var(--color-primary);
     font-size: 0.688rem;
     font-weight: bold;
     display: flex;
