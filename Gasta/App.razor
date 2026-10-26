@@ -1,0 +1,19 @@
+﻿@* <Router AppAssembly="@typeof(App).Assembly" NotFoundPage="typeof(Gasta.Shared.Pages.NotFound)">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Gasta.Shared.Layout.MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+</Router> *@
+
+
+<Router AppAssembly="@typeof(App).Assembly"
+        AdditionalAssemblies="new[] { typeof(Gasta.Shared.Pages.NotFound).Assembly }"
+        NotFoundPage="@typeof(Gasta.Shared.Pages.NotFound)">
+
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData"
+                   DefaultLayout="@typeof(Gasta.Shared.Layout.MainLayout)" />
+
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+</Router>

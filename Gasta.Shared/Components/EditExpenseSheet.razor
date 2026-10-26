@@ -1,0 +1,177 @@
+@* Usage: <EditExpenseSheet @bind-IsOpen="ShowEdit" ExpenseId="id" OnSaved="LoadAsync" /> *@
+@inject IExpenseRepository ExpenseRepository
+@inject ICategoryRepository CategoryRepository
+@inject IPaymentMethodRepository PaymentMethodRepository
+@inject IJSRuntime JS
+
+<div class="sheet-scrim @(IsOpen ? "open" : "")" @onclick="Cancel"></div>
+<div class="sheet-panel @(IsOpen ? "open" : "")" @onclick:stopPropagation="true">
+    <div class="sheet-notch"></div>
+
+    @if (_loaded)
+    { 
+        <div class="sheet-banner">          
+            <span class="banner-title">Edit Expense</span>
+            <button class="close-btn" @onclick="Cancel">&#10005;</button>
+        </div> 
+
+        <div class="sheet-body">
+        <label class="field-label">Date</label>
+        <div class="date-field-wrap">
+            <div class="field-input tappable">
+                <span>@Date.ToString("MMMM d, yyyy")</span>
+                <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                    <line x1="8" y1="3" x2="8" y2="7" />
+                    <line x1="16" y1="3" x2="16" y2="7" />
+                </svg>
+            </div>
+            <input type="date" class="overlay-date-input"
+                   value="@Date.ToString("yyyy-MM-dd")" @onchange="OnDateChanged" />
+        </div>
+
+        <label class="field-label">Category</label>
+        <div class="field-input tappable category-field" @onclick="() => ShowCategoryPicker = true">
+            @if (SelectedCategory is not null)
+            {
+                <span class="field-left">
+                    <CategoryIcon IconKey="@SelectedCategory.IconKey" LogoImage="@SelectedCategory.LogoImage" Color="@SelectedCategory.ColorKey" Size="20"  />
+                    <span>@SelectedCategory.Name</span>
+                </span>
+            }
+            else
+            {
+                <span class="placeholder-text">Select category</span>
+            }
+            <span class="chevron">&#10095;</span>
+        </div>
+
+        <label class="field-label">Amount</label>
+        <div class="field-input tappable" @onclick="() => ShowKeypad = true">
+            @if (Amount <= 0)
+            {
+                <span class="placeholder-text">Tap to enter amount</span>
+            }
+            else
+            {
+                <span>@Amount.ToString("₱#,##0.00")</span>
+            }
+            <span class="chevron">&#10095;</span>
+        </div>
+
+         <label class="field-label">Payment Method</label>
+        <div class="chip-wrap">
+            @foreach (var m in PaymentMethods)
+            {
+                <div class="pm-chip @(SelectedPaymentMethodId == m.Id ? "selected" : "")" @onclick="() => SelectedPaymentMethodId = m.Id">
+                    <PaymentMethodIcon LogoImage="@m.LogoImage" Name="@m.Name" PreferIcon="true" ColorKey="@m.ColorKey" Size="18" />
+                    <span>@m.Name</span>
+                </div>
+            }
+        </div>
+
+        <label class="field-label">Notes</label>
+        <textarea class="field-input notes" @bind="Notes" placeholder="Optional note..."></textarea>
+
+        <div class="action-row">
+            <button class="cancel-button" @onclick="Cancel">Cancel</button>
+            <button class="save-button" disabled="@(!CanSave)" @onclick="Save">Save</button>
+        </div>
+        </div>
+    }
+</div>
+
+<NumericKeypad @bind-IsOpen="ShowKeypad" InitialValue="Amount" OnConfirmed="v => Amount = v" />
+
+<CategoryPicker @bind-IsOpen="ShowCategoryPicker" Categories="Categories"
+                SelectedCategoryId="SelectedCategoryId" OnSelected="id => SelectedCategoryId = id" OnCategoryAdded="OnCategoryAdded" />
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public int ExpenseId { get; set; }
+    [Parameter] public EventCallback OnSaved { get; set; }
+
+    private bool _wasOpen;
+    private bool _loaded;
+    private bool ShowKeypad;
+    private bool ShowCategoryPicker;
+    private ElementReference _dateInputRef;
+
+    private DateTime Date = DateTime.Now;
+    private decimal Amount;
+    private int? SelectedCategoryId;
+    private int? SelectedPaymentMethodId;
+    private string Notes = "";
+
+    private List<Category> Categories = new();
+    private List<PaymentMethod> PaymentMethods = new();
+
+    private Category? SelectedCategory =>
+        Categories.FirstOrDefault(c => c.Id == SelectedCategoryId);
+
+    private bool CanSave => Amount > 0 && SelectedCategoryId.HasValue && SelectedPaymentMethodId.HasValue;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsOpen && !_wasOpen)
+        {
+            _loaded = false;
+            ShowKeypad = false;
+            ShowCategoryPicker = false;
+
+            if (Categories.Count == 0)
+                Categories = await CategoryRepository.GetActiveOrderedAsync();
+            if (PaymentMethods.Count == 0)
+                PaymentMethods = await PaymentMethodRepository.GetActiveOrderedAsync();
+
+            var expense = await ExpenseRepository.GetByIdAsync(ExpenseId);
+            if (expense is not null)
+            {
+                Date = expense.Date;
+                Amount = expense.Amount;
+                SelectedCategoryId = expense.CategoryId;
+                SelectedPaymentMethodId = expense.PaymentMethodId;
+                Notes = expense.Notes ?? "";
+            }
+
+            _loaded = true;
+        }
+        _wasOpen = IsOpen;
+    }
+
+    private void OnDateChanged(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out var d))
+            Date = d;
+    } 
+
+    private void OnCategoryAdded(Category cat) => Categories.Add(cat);
+
+    private async Task Save()
+    {
+        if (!CanSave) return;
+
+        var expense = await ExpenseRepository.GetByIdAsync(ExpenseId)
+                       ?? new Expense { Id = ExpenseId };
+
+        expense.Date = Date;
+        expense.Amount = Amount;
+        expense.CategoryId = SelectedCategoryId!.Value;
+        expense.PaymentMethodId = SelectedPaymentMethodId!.Value;
+        expense.Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes;
+
+        await ExpenseRepository.SaveAsync(expense);
+        await OnSaved.InvokeAsync();
+        await Close();
+    }
+
+    private async Task Cancel() => await Close();
+
+    private async Task Close()
+    {
+        IsOpen = false;
+        await IsOpenChanged.InvokeAsync(false);
+    }
+}

@@ -1,0 +1,117 @@
+@* Usage: <SwipeableTransactionRow Item="item" OnTap="OpenEdit" OnDelete="DeleteExpense" ShowPaymentMethod="true" /> *@
+@inject IJSRuntime JS
+
+<div class="transaction-row-wrap">
+    <div class="delete-action" @onclick="() => OnDelete.InvokeAsync(Item.Id)">🗑 Delete</div>
+
+    <div class="transaction-row" @ref="_rowRef"
+         style="transform:translateX(@(_offset.ToString(System.Globalization.CultureInfo.InvariantCulture))px);"
+         @onpointerdown="OnPointerDown"
+         @onpointermove="OnPointerMove"
+         @onpointerup="OnPointerUp"
+         @onpointercancel="OnPointerCancel"
+         @onclick="OnClick">
+        <div class="tx-icon" style="background:@ColorHelper.Lighten(Item.CategoryColorKey, 0.75);">
+            <CategoryIcon IconKey="@Item.CategoryIconKey" LogoImage="@Item.CategoryLogo" Color="@Item.CategoryColorKey" Size="20" />
+        </div>
+        <div class="tx-info">
+            <span class="tx-category">@Item.CategoryName</span>
+            @if (!string.IsNullOrWhiteSpace(Item.Notes))
+            {
+                <span class="tx-notes">@Item.Notes</span>
+            }
+           @*  <span class="tx-meta-row">
+                <span class="tx-date">@Item.Date.ToString("MMM d")</span>
+                @if (ShowPaymentMethod && !string.IsNullOrWhiteSpace(Item.PaymentMethodName))
+                {
+                    <span class="tx-pm">
+                        <PaymentMethodIcon LogoImage="@Item.PaymentMethodLogo" Name="@Item.PaymentMethodName" ShowLabelWithFallback="true" LabelFallbackSize="0.65rem" ColorKey="@Item.PaymentMethodColorKey" ShowBackground="false" Size="12" />
+                    </span>
+                }
+            </span> *@
+            <span class="tx-meta-row">
+                <span class="tx-date">@Item.Date.ToString("MMM d")</span>
+                @if (ShowPaymentMethod && !string.IsNullOrWhiteSpace(Item.PaymentMethodName))
+                {
+                    <span class="tx-pm">
+                        <span class="tx-pm-dot" style="background:@(Item.PaymentMethodColorKey ?? "#9AA0A6");"></span>
+                        <span>@Item.PaymentMethodName</span>
+                    </span>
+                }
+            </span>
+        </div>
+        <strong class="tx-amount">@Item.Amount.ToString("₱#,##0.00")</strong>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public ExpenseListItem Item { get; set; } = default!;
+    [Parameter] public EventCallback<int> OnTap { get; set; }
+    [Parameter] public EventCallback<int> OnDelete { get; set; }
+
+    // Off by default — ExpenseListPage doesn't need this (its header already IS the
+    // payment method), so it never sets this parameter and renders exactly as before.
+    // Only AllTransactionsPage (spanning every payment method) turns it on.
+    [Parameter] public bool ShowPaymentMethod { get; set; } = false;
+
+    private ElementReference _rowRef;
+    private double _offset;
+    private double _startX;
+    private double _startOffset;
+    private bool _dragging;
+    private bool _dragMoved;
+
+    private const double RevealOffset = -84;   // matches .delete-action width
+    private const double DragThreshold = 10;   // px before it counts as a real drag
+    private const double SnapThreshold = 40;   // px dragged before snapping fully open/closed
+
+    private async Task OnPointerDown(PointerEventArgs e)
+    {
+        _dragging = true;
+        _startX = e.ClientX;
+        _startOffset = _offset;
+        _dragMoved = false;
+        await JS.InvokeVoidAsync("gastaPointer.capture", _rowRef, e.PointerId);
+    }
+
+    private void OnPointerMove(PointerEventArgs e)
+    {
+        if (!_dragging) return;
+        var dx = e.ClientX - _startX;
+        if (Math.Abs(dx) > DragThreshold) _dragMoved = true;
+        _offset = Math.Clamp(_startOffset + dx, RevealOffset, 0);
+    }
+
+    private void OnPointerUp(PointerEventArgs e)
+    {
+        if (!_dragging) return;
+        _dragging = false;
+        if (_dragMoved)
+        {
+            _offset = _offset < -SnapThreshold ? RevealOffset : 0;
+        }
+    }
+
+    private async Task OnClick()
+    {
+        if (_dragMoved)
+        {
+            _dragMoved = false;
+            return;
+        }
+        if (_offset < -1)
+        {
+            _offset = 0;
+        }
+        else
+        {
+            await OnTap.InvokeAsync(Item.Id);
+        }
+    }
+
+    private void OnPointerCancel()
+    {
+        if (_dragging) _offset = _startOffset;
+        _dragging = false;
+    }
+}

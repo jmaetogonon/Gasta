@@ -1,0 +1,112 @@
+/* Width comes from --content-max (theme.css): 480px on phones (unchanged), 640px from
+   600px up, 760px from 900px up. Padding is intentionally a fixed 20px at every width —
+   the sticky headers on Home / AllTransactions / Settings / ManageCategories /
+   ManagePaymentMethods cancel it with margin:-20px, and ManageBudgetPage sizes itself
+   against it (see that file's comment). Change it here only together with those. */
+.app-content {
+    max-width: var(--content-max, 480px);
+    margin: 0 auto;
+    padding: 20px;
+    padding-bottom: 110px; /* clears the full-width nav so content never hides behind it */
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    /*max-width: var(--content-max, 480px);*/
+    margin: 0 auto;
+    background: var(--nav-bg);
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 16px 18px calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ::deep is required for every NavLink-based rule below. <NavLink> is a separate
+   Razor component, so the <a> it renders never receives MainLayout's own CSS
+   isolation scope attribute — a plain scoped selector like ".nav-item" compiles to
+   ".nav-item[b-xxxx]" and silently never matches that <a>. ::deep tells the compiler
+   not to require the scope attribute here. .nav-item-add is a plain <button>
+   authored directly in this file, so it does NOT need ::deep — it's styled with a
+   normal scoped selector further down. */
+::deep .nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 16px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    opacity: 0.6;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+    ::deep .nav-item svg {
+        transition: transform 0.2s ease;
+    }
+
+    /* No background pill anymore — was white icon on a pale pastel tint in light
+       mode, a real contrast failure (icon nearly invisible), not just a style
+       choice. Standard modern tab-bar pattern instead: selected = accent-colored
+       icon only. Works identically across all 7 presets x both themes with zero
+       contrast risk, since it's always --color-primary against --nav-bg, the same
+       pairing already used and verified for buttons elsewhere in the app. */
+    ::deep .nav-item.active {
+        opacity: 1;
+        color: var(--color-primary);
+        background: var(--nav-active-bg);
+    }
+
+        ::deep .nav-item.active svg {
+            transform: translateY(-1px);
+        }
+
+/* Center Add button — not a route, so it has no "active" state; always shows the
+   accent treatment since it's the app's one constant primary action. */
+.nav-item-add {
+    background: linear-gradient(150deg, var(--color-primary), var(--color-primary-dark));
+    color: white !important;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    opacity: 1;
+    /* color-mix ties the shadow tint to whatever accent is currently active,
+       instead of a hardcoded purple rgba — was always purple regardless of the
+       chosen preset before. */
+    box-shadow: 0 6px 14px color-mix(in srgb, var(--color-primary) 40%, transparent);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Wide screens (desktop windows, iPad landscape): a full-width bar pinned to the
+   bottom of a 1000px+ window looks stranded, so it becomes a slim rail on the left
+   edge. Same items, same order, same styling — only the axis changes. The content
+   column stays centered in the window; at 1024px it starts at x=132, clear of the
+   84px rail. .app-content's bottom padding is left alone on purpose (ManageBudgetPage
+   depends on it); it only shows as a little extra space under the last item. */
+@media (min-width: 1024px) {
+    .bottom-nav {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: auto;
+        width: 84px;
+        max-width: none;
+        margin: 0;
+        flex-direction: column;
+        justify-content: center;
+        gap: 18px;
+        padding: 20px 0;
+        border-right: 1px solid var(--border);
+    }
+}

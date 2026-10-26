@@ -1,0 +1,136 @@
+.picker-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 25;
+}
+
+    .picker-scrim.open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+.picker-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 70vh;
+    overflow-y: auto;
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    transform: translateY(100%);
+    transition: transform 0.28s ease;
+    z-index: 26;
+}
+
+    .picker-sheet.open {
+        transform: translateY(0);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+.picker-sheet-body {
+    padding: 18px 18px 26px;
+}
+
+.sheet-notch {
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    margin: 10px auto 0;
+    /* Visual anchor only — these sheets close via scrim-tap or a Cancel/X button,
+       not drag-to-dismiss, so deliberately no cursor:grab or hover state here that
+       would imply otherwise. */
+}
+
+.picker-title {
+    font-weight: bold;
+    font-size: 1rem;
+    font-family: var(--font-display);
+    margin-bottom: 16px;
+}
+
+.picker-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+ }
+
+.picker-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.picker-icon-wrap {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .picker-icon-wrap img {
+        max-width: 32px;
+        max-height: 26px;
+    }
+
+.picker-check {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: white;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--surface);
+}
+
+.picker-name {
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--font-display);
+}
+
+/* Selected state — ring around the icon circle + accented name, same visual language
+   as CategoryEditSheet's color-swatch .selected state. */
+.picker-item.selected .picker-icon-wrap {
+    box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--color-primary);
+}
+
+.picker-item.selected .picker-name {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+/* Add-category tile — dashed border distinguishes it from real category tiles at a
+   glance, same "this is an action, not a choice" cue as a ghost/outline button. */
+.picker-icon-wrap-add {
+    background: var(--surface-alt);
+    border: 2px dashed var(--border);
+}
+
+.picker-add-plus {
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--color-primary);
+    line-height: 1;
+}
+
+.picker-item-add .picker-name {
+    color: var(--color-primary);
+}

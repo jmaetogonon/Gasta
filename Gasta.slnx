@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Gasta.Shared/Gasta.Shared.csproj" />
+  <Project Path="Gasta/Gasta.csproj" />
+</Solution>

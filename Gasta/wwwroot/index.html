@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gasta</title>
+    <base href="/" />
+
+    <!-- Apply the saved theme before the page renders -->
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('gasta-theme'); // matches ThemeService.StorageKey
+                var theme = saved === 'Dark' ? 'dark' : 'light';  // matches ThemeService's casing
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
+
+    <link rel="preload" id="webassembly" />
+
+    <!-- Shared project CSS -->
+    <link rel="stylesheet"
+          href="_content/Gasta.Shared/css/theme.css?v=4" />
+    <link rel="stylesheet"
+          href="_content/Gasta.Shared/css/app.css?v=3" />
+     
+    <!-- Host project assets -->
+    <link rel="icon" type="image/png" href="gasta.png" />
+    <link href="Gasta.styles.css" rel="stylesheet" />
+    <link href="manifest.webmanifest" rel="manifest" />
+    <link rel="apple-touch-icon" sizes="512x512" href="gastalogo.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="gasta.png" />
+    <script type="importmap"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="loading-screen">
+            <div class="loading-ring-wrap">
+                <svg class="loading-ring" viewBox="0 0 120 120">
+                    <circle class="loading-ring-track" cx="60" cy="60" r="54" />
+                    <circle class="loading-ring-bar" cx="60" cy="60" r="54" />
+                </svg>
+                <div class="loading-video-wrap">
+                    <div class="loading-video-crop"> 
+                        <img class="loading-video"
+                             src="_content/Gasta.Shared/images/gasta-icon-square.gif"
+                             alt="Gasta" />
+                    </div>
+                </div>
+            </div>
+            <div class="loading-percentage"></div>
+            <div class="loading-text">Loading Gasta<span class="loading-dots"><span></span><span></span><span></span></span></div>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="." class="reload">Reload</a>
+        <span class="dismiss">🗙</span>
+    </div>
+
+    <!-- Shared project JavaScript -->
+    <script src="_content/Gasta.Shared/js/theme.js"></script>
+    <script src="_content/Gasta.Shared/js/pointer.js"></script>
+    <script src="_content/Gasta.Shared/js/export.js"></script>
+    <script src="_content/Gasta.Shared/js/settingsHeader.js"></script>
+    <script src="_content/Gasta.Shared/js/accentColor.js"></script>
+
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+    <script>
+        navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' })
+            .then(reg => {
+                // Proactively ask the browser to re-check for an update right away,
+                // rather than waiting for its own internal timing. Still only works
+                // if the fetched service-worker.js is actually byte-different from
+                // what's installed — this doesn't replace the build-stamping fix,
+                // it just makes sure a real update is noticed as soon as possible
+                // once that fix is in place.
+                reg.update();
+            });
+
+        let hasReloaded = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (hasReloaded) return;
+            hasReloaded = true;
+            window.location.reload();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+.sheet-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 20;
+}
+
+    .sheet-scrim.open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+.sheet-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    overflow: hidden; /* clips the banner's corners to match the sheet's own rounding */
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 21;
+}
+
+    .sheet-panel.open {
+        transform: translateY(0);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+.sheet-banner {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 18px;
+    background: linear-gradient(150deg, var(--color-primary), var(--color-primary-dark));
+    box-shadow: 0 2px 7px color-mix(in srgb, var(--color-primary) 30%, transparent);
+    position: relative;
+    z-index: 1;
+}
+
+.sheet-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 18px 0;
+}
+
+.sheet-title {
+    font-weight: bold;
+    font-size: 1rem;
+ }
+
+.category-field {
+    justify-content: space-between;
+}
+
+.field-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.banner-title {
+    color: white;
+    font-weight: bold;
+    font-size: 0.875rem;
+    letter-spacing: 0.3px;
+ }
+
+.close-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.28);
+    color: white;
+    font-size: 0.813rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sheet-body {
+    padding: 20px 18px 28px;
+    overflow-y: auto;
+}
+
+.field-label {
+    display: block;
+    font-size: 0.688rem;
+    color: var(--text-secondary);
+    margin: 14px 0 4px;
+}
+
+    .field-label:first-child {
+        margin-top: 0;
+    }
+
+.field-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0 14px;
+    height: 48px;
+    background: var(--surface-alt);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+    .field-input.tappable {
+        cursor: pointer;
+        justify-content: space-between;
+    }
+
+    .field-input.notes {
+        height: auto;
+        min-height: 60px;
+        resize: vertical;
+        align-items: flex-start;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        font-family: inherit;
+        color: var(--text-primary);
+    }
+
+.date-field-wrap {
+    position: relative;
+}
+
+.overlay-date-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    border: none;
+    padding: 0;
+    margin: 0;
+    /* Real, tappable, full-size — this IS the interaction now, not a JS-triggered
+       proxy. That's what avoids iOS's user-activation-through-interop problem
+       entirely, rather than working around a symptom of it. */
+}
+
+    /* By default, only the browser's own calendar-icon glyph inside the input is
+       the actual click target for opening the picker — the rest of the box is
+       hit-testable but inert. Stretching the picker-indicator pseudo-element to
+       fill the whole input makes the entire box the click target, matching the
+       visible .field-input's full size. WebKit/Chromium only — Firefox has no
+       equivalent pseudo-element, so on Firefox this falls back to icon-only, which
+       isn't a practical concern for an iOS/Android-focused PWA. */
+    .overlay-date-input::-webkit-calendar-picker-indicator {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+
+.chevron-icon {
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.placeholder-text {
+    color: var(--text-secondary);
+    font-weight: normal;
+}
+
+.chevron {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: normal;
+}
+
+.remaining-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding: 10px 4px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.remaining-label {
+    font-size: 0.688rem;
+    color: var(--text-secondary);
+}
+
+.remaining-amount {
+    font-weight: 600;
+    font-size: 0.813rem;
+    color: var(--success);
+    font-family: var(--font-display);
+}
+
+    .remaining-amount.danger-text {
+        color: var(--danger);
+    }
+
+.chip-wrap { 
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px; 
+}
+
+.pm-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--surface-alt);
+    border: 2px solid var(--border);
+    font-size: 0.625rem;
+    font-weight: 500;
+    font-family: var(--font-display);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+    .pm-chip.selected {
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+        background: color-mix(in srgb, var(--color-primary) 12%, var(--surface-alt));
+    }
+
+.action-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.save-button, .cancel-button {
+    flex: 1;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    font-family: var(--font-display);
+}
+
+.save-button {
+    border: none;
+    background: var(--color-primary);
+    color: white;
+}
+
+    .save-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+.cancel-button {
+    border: 1.5px solid var(--color-primary);
+    background: transparent;
+    color: var(--color-primary);
+}
