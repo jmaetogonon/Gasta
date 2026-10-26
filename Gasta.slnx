@@ -1,4 +1,7 @@
 <Solution>
+  <Project Path="Gasta.Maui/Gasta.Maui.csproj" Id="7ce0f6b9-0e64-491d-bba5-562669a7e419">
+    <Deploy Solution="Debug|*" />
+  </Project>
   <Project Path="Gasta.Shared/Gasta.Shared.csproj" />
   <Project Path="Gasta/Gasta.csproj" />
 </Solution>
