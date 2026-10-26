@@ -1,5 +1,8 @@
 ﻿name: Deploy Gasta PWA
 
+# The web host lives in Gasta/ (Gasta.csproj + wwwroot); shared UI lives in Gasta.Shared/.
+# Shared static files are published under wwwroot/_content/Gasta.Shared/.
+
 on:
   push:
     branches:
@@ -17,12 +20,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -31,19 +32,32 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      # Fails the build if code asks for a root-absolute framework/shared URL such as
+      # "/_content/...". On GitHub Pages the app lives under /Gasta/, so a leading slash
+      # points outside the app. Use "./_content/..." (resolved against <base href>) instead.
+      - name: Check for root-absolute asset URLs
+        run: |
+          if grep -rnE '"/_(content|framework)/' Gasta Gasta.Shared --include=*.cs --include=*.razor; then
+            echo "::error::Found root-absolute /_content or /_framework URLs above. Use ./_content/... instead."
+            exit 1
+          fi
+          echo "no root-absolute asset URLs"
+
+      # Rewrites whatever <base href> is committed, so local dev can keep "/" if wanted.
       - name: Set GitHub Pages base href
         run: |
-          sed -i 's|<base href="/" />|<base href="/Gasta/" />|' wwwroot/index.html
+          sed -i 's|<base href="[^"]*" */>|<base href="/Gasta/" />|' Gasta/wwwroot/index.html
 
       - name: Verify base href
         run: |
-          grep '<base href=' wwwroot/index.html
+          grep '<base href=' Gasta/wwwroot/index.html
+          grep -q '<base href="/Gasta/" />' Gasta/wwwroot/index.html
 
       - name: Restore
-        run: dotnet restore Gasta.csproj
+        run: dotnet restore Gasta/Gasta.csproj
 
       - name: Publish
-        run: dotnet publish Gasta.csproj -c Release -o ./publish
+        run: dotnet publish Gasta/Gasta.csproj -c Release -o ./publish
 
       - name: Stamp service worker with build version
         run: |
@@ -57,16 +71,25 @@ jobs:
         run: |
           echo "===== WWWROOT ====="
           find ./publish/wwwroot -maxdepth 2 -type f | sort
+          echo "===== SHARED STATIC FILES ====="
+          find ./publish/wwwroot/_content/Gasta.Shared -type f | sort | head -80
 
       - name: Verify index
         run: |
           test -f ./publish/wwwroot/index.html
           echo "index.html exists"
 
-      - name: Verify theme.js
+      # Globs (name*) so this passes whether .NET publishes a file as theme.js or as a
+      # fingerprinted theme.<hash>.js; it only fails if the file is genuinely missing.
+      - name: Verify shared scripts and styles
         run: |
-          test -f ./publish/wwwroot/js/theme.js
-          echo "theme.js exists"
+          for f in js/theme js/db css/theme; do
+            compgen -G "./publish/wwwroot/_content/Gasta.Shared/${f}*" > /dev/null \
+              || { echo "::error::missing published file: _content/Gasta.Shared/${f}*"; exit 1; }
+          done
+          compgen -G "./publish/wwwroot/Gasta*.styles.css" > /dev/null \
+            || { echo "::error::missing published Gasta.styles.css"; exit 1; }
+          echo "shared theme.js, db.js, theme.css and Gasta.styles.css exist"
 
       - name: Create 404 fallback
         run: |
@@ -90,7 +113,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

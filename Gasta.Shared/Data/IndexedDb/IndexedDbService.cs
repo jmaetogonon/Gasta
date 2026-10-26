@@ -10,7 +10,10 @@ public class IndexedDbService : IAsyncDisposable
 
     public IndexedDbService(IJSRuntime jsRuntime)
     {
-        _moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>("import", "/_content/Gasta.Shared/js/db.js").AsTask());
+        // Keep the leading "./": it resolves against <base href>, so it works at the site root
+        // (localhost) AND under a sub-path (jmaetogonon.github.io/Gasta/). A leading "/" is
+        // root-absolute and silently points outside the app on GitHub Pages.
+        _moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Gasta.Shared/js/db.js").AsTask());
     }
 
     private async Task<IJSObjectReference> ModuleAsync() => await _moduleTask.Value;
