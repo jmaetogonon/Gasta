@@ -1,6 +1,94 @@
-﻿<Router AppAssembly="typeof(MauiProgram).Assembly" NotFoundPage="typeof(Pages.NotFound)">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
-    </Found>
-</Router>
+﻿@using Gasta.Maui.Services
+@using Gasta.Shared.Abstractions
+@using Gasta.Shared.Services
+@implements IDisposable
+@inject AppInitializer Initializer
+@inject IJSRuntime JS
+@inject ISystemBars SystemBars
+@inject IKeyValueStore Store
+
+@* Same guarantee as the web host's Program.cs: the database is opened, seeded and the saved
+   theme applied BEFORE any page runs OnInitializedAsync. The web host does this before
+   RunAsync(); here the JS runtime only exists once the WebView is up, so the gate lives in
+   the root component instead. AppInitializer is idempotent, so a retry is safe. *@
+
+@if (_error is not null)
+{
+    <div style="padding:24px;font-family:sans-serif">
+        <h3>Gasta couldn't start</h3>
+        <p>@_error</p>
+        <button @onclick="Start">Try again</button>
+    </div>
+}
+else if (!_ready)
+{
+    <div class="loading-screen hybrid">
+        <div class="loading-ring-wrap">
+            <svg class="loading-ring" viewBox="0 0 120 120">
+                <circle class="loading-ring-track" cx="60" cy="60" r="54" />
+                <circle class="loading-ring-bar" cx="60" cy="60" r="54" />
+            </svg>
+            <div class="loading-video-wrap">
+                <div class="loading-video-crop">
+                    <img class="loading-video" src="_content/Gasta.Shared/images/gasta-icon-square.gif" alt="Gasta" />
+                </div>
+            </div>
+        </div>
+        <div class="loading-percentage"></div>
+        <div class="loading-text">Loading Gasta<span class="loading-dots"><span></span><span></span><span></span></span></div>
+    </div>
+}
+else
+{
+    <Router AppAssembly="@typeof(Gasta.Shared.Pages.NotFound).Assembly"
+            NotFoundPage="@typeof(Gasta.Shared.Pages.NotFound)">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(Gasta.Shared.Layout.MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+    </Router>
+}
+
+@code {
+    private bool _ready;
+    private string? _error;
+    private DotNetObjectReference<Routes>? _self;
+
+    // Starts the page -> native colour sync (wwwroot/chrome.js). The page reports its
+    // background colour whenever theme or accent changes; the shell paints the system
+    // bar strips with it.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        _self = DotNetObjectReference.Create(this);
+        try { await JS.InvokeVoidAsync("gastaChrome.start", _self); }
+        catch { /* cosmetic only: bars keep their last colour */ }
+    }
+
+    [JSInvokable]
+    public void OnPageColor(string hexColor, bool dark) => SystemBars.Apply(hexColor, dark);
+
+    public void Dispose() => _self?.Dispose();
+
+    protected override Task OnInitializedAsync() => Start();
+
+    private async Task Start()
+    {
+        _error = null;
+        try
+        {
+            // The pre-render script in index.html can only read localStorage, which the app no
+            // longer writes (settings live in Preferences). Apply the saved theme right away so a
+            // dark-mode user doesn't sit through a light loading screen while the database opens.
+            var theme = await Store.GetAsync("gasta-theme") ?? "Light";   // same key as ThemeService
+            await JS.InvokeVoidAsync("gastaTheme.apply", theme);
+
+            await Initializer.InitializeAsync();
+            _ready = true;
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+}

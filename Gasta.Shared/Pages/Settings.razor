@@ -162,7 +162,7 @@
                         </div>
                         <span class="chevron">&#10095;</span>
                     </div>
-                    <InputFile class="file-input-overlay" OnChange="OnFileSelected" accept=".json,.csv" />
+                    <InputFile @key="_fileInputKey" class="file-input-overlay" OnChange="OnFileSelected" accept=".json,.csv" />
                 </div>
 
                 @if (SelectedFileName is not null)
@@ -242,6 +242,7 @@
 
     private IBrowserFile? SelectedFile;
     private string? SelectedFileName;
+    private int _fileInputKey;
 
     protected override async Task OnInitializedAsync()
     {
@@ -394,35 +395,53 @@
             confirmText: isJson ? "Replace" : "Import", cancelText: "Cancel");
         if (!confirmed) return;
 
+        var file = SelectedFile;
+        string? errorMessage = null;
         IsBusy = true;
         try
         {
-            using var stream = SelectedFile.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024);
-            using var reader = new StreamReader(stream);
-            var content = await reader.ReadToEndAsync();
-
-            if (isJson)
-                await RestoreFromJson(content);
-            else
-                await MergeFromCsv(content);
+            // WaitAsync: if anything underneath ever stalls (file read, database), give up after
+            // a minute and show a message instead of leaving the button stuck on "Working...".
+            await ReadAndImportAsync(file, isJson).WaitAsync(TimeSpan.FromSeconds(60));
         }
         catch (GastaImportException ex)
         {
-            await Alert.ShowAsync(ex.Message, "Couldn't Import File");
+            errorMessage = ex.Message;
+        }
+        catch (TimeoutException)
+        {
+            errorMessage = "Importing took too long and was stopped. Please try again.";
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Import failed: {ex}");
-            await Alert.ShowAsync(
-                "Something went wrong reading that file. Make sure it's a Gasta backup or export, then try again.",
-                "Couldn't Import File");
+            errorMessage = "Something went wrong reading that file. Make sure it's a Gasta backup or export, then try again.";
         }
         finally
         {
+            // Reset BEFORE showing any error dialog, so the button never stays on "Working..."
+            // behind it. A new @key also gives the file input a fresh element, so choosing the
+            // next file (or the same one again) always raises OnChange.
             IsBusy = false;
             SelectedFile = null;
             SelectedFileName = null;
+            _fileInputKey++;
         }
+
+        if (errorMessage is not null)
+            await Alert.ShowAsync(errorMessage, "Couldn't Import File");
+    }
+
+    private async Task ReadAndImportAsync(IBrowserFile file, bool isJson)
+    {
+        using var stream = file.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024);
+        using var reader = new StreamReader(stream);
+        var content = await reader.ReadToEndAsync();
+
+        if (isJson)
+            await RestoreFromJson(content);
+        else
+            await MergeFromCsv(content);
     }
 
     private async Task RestoreFromJson(string json)
